@@ -1,0 +1,140 @@
+﻿@using WeddingVeneus1.Areas.Booking.Models;
+@model BookingModel
+@{
+}
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+
+<div style="margin-top: 40px; background-color: #eee;" class="col-lg-6" >
+    <div style="box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%); position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 0 solid rgba(0,0,0,.125); border-radius: 1rem;">
+        <div style="flex: 1;">
+            <div style="padding: 20px;">
+                <div style="text-align: right; font-size: 10px;">
+                    <h4 style="float: right; margin: 0;">GSTNO. 00AAECR2971C17 </h4>
+                    <!-- Commented out the Bootdey.com line -->
+                    <!-- <div style="margin-bottom: 4px;">
+                        <h2 style="margin: 0 0 1px; color: #6c757d;">Bootdey.com</h2>
+                    </div> -->
+                    
+                </div>
+                <div style="color: #6c757d;">
+                    <p style="margin: 0 0 1px;">3184 Marine Drive Mumbai, Mu 15201</p>
+                    <p style="margin: 0 0 1px;"><i style="margin-right: 1px;" class="uil uil-envelope-alt"></i> mandapbookingplatform@gmail.com</p>
+                    <p><i style="margin-right: 1px;" class="uil uil-phone"></i> 222-666-2222</p>
+                </div>
+
+                <hr style="margin: 20px 0;">
+
+                <div style="display: flex;">
+                    <div style="flex: 1;">
+                        <div style="color: #6c757d;">
+                            <h5 style="font-size: 16px; margin-bottom: 3px;">Billed To:</h5>
+                            <h5 style="font-size: 15px; margin: 0 0 2px;">@Model.UserName</h5>
+                            @* <p style="margin: 0 0 1px;">4068 Post Avenue Newfolden, MN 56738</p> *@
+                            <p style="margin: 0 0 1px;">@Model.Email</p>
+                            <p>@Model.ContactNO</p>
+                        </div>
+                    </div>
+                    <div style="flex: 1; text-align: right;">
+                        <div style="color: #6c757d;">
+                            <div>
+                                <h5 style="font-size: 15px; margin: 0 0 1px;">Invoice No:</h5>
+                                <p>@Model.PaymentID</p>
+                            </div>
+                            <div style="margin-top: 4px;">
+                                <h5 style="font-size: 15px; margin: 0 0 1px;">Invoice Date:</h5>
+                                <p>@Model.PaymentDate</p>
+                            </div>
+                            <div style="margin-top: 4px;">
+                                <h5 style="font-size: 15px; margin: 0 0 1px;">Booking No:</h5>
+                                <p>@Model.BookingID</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding-top: 2px;">
+                    <h5 style="font-size: 15px;">Booking Summary</h5>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 0;" border="1">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;">No.</th>
+                                    <th>VenueName</th>
+                                    <th>BookingStartDate</th>
+                                    <th>BookingEndDate</th>
+                                    <th style="text-align: right; width: 120px;">NumberOfDays</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">01</th>
+                                    <td>
+                                        <div>
+                                            <h5 style="font-size: 14px; margin-bottom: 1px;">@Model.VenueName</h5>
+                                            
+                                        </div>
+                                    </td>
+                                    <td>@Model.BookingStartDate</td>
+                                    <td>@Model.BookingEndDate</td>
+                                    <td>@Model.NumOfDays</td>
+                                </tr>
+                                
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right;">Total Amount:</th>
+                                    <td style="text-align: right;"><i class="bi bi-currency-rupee"></i>@Model.Amount</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;">Amount Paid</th>
+                                    <td style="text-align: right; border: 0;"><i class="bi bi-currency-rupee"></i>-@Model.AdvancePayment</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;">Pending Amount :</th>
+                                    <td style="text-align: right; border: 0;"><i class="bi bi-currency-rupee"></i>@Model.PaymentAfterEvent</td>
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;">Paid</th>
+                                    <td style="text-align: right; border: 0;"><h4 style="margin: 0; font-weight: 600;"><i class="bi bi-currency-rupee"></i>@Model.PaymentAmount</h4></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 4px;">
+                        <div class="d-print-none">
+                            <div style="text-align: right;">
+                                <a asp-area="Booking" asp-controller="Booking" asp-action="GeneratePdf" asp-route-BookingID="@Model.BookingID" asp-route-PaymentID="@Model.PaymentID" style="background-color: #28a745; color: #fff; margin-right: 1px; padding: 6px 12px; text-decoration: none; font-size: 12px;"><i class="fa fa-print"></i></a>
+                                <a  href="#" style="background-color: #007bff; color: #fff; padding: 6px 12px; text-decoration: none; font-size: 14px;">Send</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script>
+    $('#gen').click(function () {
+            var receiptHtml = $('#htmlContent').html();
+        console.log(receiptHtml);// Assuming your receipt content is within an element with ID 'receiptContainer'
+
+    
+        receiptHtml = receiptHtml.replace(/</g, "StrTag").replace(/>/g, "EndTag");
+        console.log(receiptHtml);
+            var encodedHtml = encodeURIComponent(receiptHtml);
+            console.log(encodedHtml)
+
+        console.log(receiptHtml)
+        window.open('../Booking/GeneratePdf?html=' + receiptHtml, '_blank');
+    
+});
+</script>
+
+}

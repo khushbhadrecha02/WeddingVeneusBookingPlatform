@@ -1,0 +1,135 @@
+﻿@using WeddingVeneus1.Areas.Booking.Models;
+@model BookingModel
+
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div class="pagetitle">
+    <h1>Form Layouts</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Forms</li>
+            <li class="breadcrumb-item active">Layouts</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-6">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Payment</h5>
+                    <p>Complete your payment within the next <span id="countdown">5:00</span> minutes.</p>
+
+
+                    <!-- Horizontal Form -->
+                    <form id="paymentForm" asp-area="Booking" asp-controller="Booking" asp-action="PaymentPage" method="post">
+                        <div class="row mb-3">
+                            
+
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="UserName" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="VenueName" class="form-control" id="venueName" >
+                                <input type="text" asp-for="RentPerDay" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="NumOfDays" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="Amount" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="PaymentAfterEvent" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="BookingStartDate" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="BookingEndDate" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="UserID" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="VenueID" class="form-control" id="venueID" >
+                                <input type="text" asp-for="BookingID" class="form-control" id="bookingID" hidden>
+                                <input type="text" asp-for="UserName" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="ContactNO" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="Email" class="form-control" id="inputText" hidden>
+                                <input type="text" asp-for="flag" class="form-control" id="inputText" hidden>
+                            </div>
+                            
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="Amount" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="number" asp-for="AdvancePayment" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="AdvancePayment" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="Remarks" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="Remarks" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="Remarks" class="text-danger"></span>
+                        </div>
+
+
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Pay</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </form><!-- End Horizontal Form -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Include jQuery in your view -->
+
+
+<!-- Your PaymentPage view content -->
+@section scripts{
+<script>
+    $(document).ready(function () {
+        var countdownMinutes = 5;
+        var countdownSeconds = 0;
+        var venueId = $('#venueID').val();
+        var venueName = $('#venueName').val();
+        var bookingID = $('#bookingID').val();
+        console.log(bookingID);
+        console.log("venueid"+venueId);
+        console.log("venuename"+venueName);
+        var countdownDisplay = $('#countdown');
+        console.log(countdownDisplay);
+
+        function updateCountdown() {
+            var minutesStr = countdownMinutes < 10 ? '0' + countdownMinutes : countdownMinutes;
+            var secondsStr = countdownSeconds < 10 ? '0' + countdownSeconds : countdownSeconds;
+
+            countdownDisplay.text(minutesStr + ':' + secondsStr);
+        }
+
+        function startCountdown() {
+            var countdownInterval = setInterval(function () {
+                if (countdownMinutes === 0 && countdownSeconds === 0) {
+                    clearInterval(countdownInterval);
+                    // Redirect when the countdown reaches 0
+                    window.location.href = '@Url.Action("CheckBooking", "Booking")?venueId=' + venueId + '&venueName=' + venueName;
+                        
+                } else {
+                    updateCountdown();
+                    if (countdownSeconds === 0) {
+                        countdownMinutes--;
+                        countdownSeconds = 59;
+                    } else {
+                        countdownSeconds--;
+                    }
+                }
+            }, 1000);
+        }
+
+        // Start the countdown when the page loads
+        startCountdown();
+
+        
+        
+    });
+</script>
+}
+
+
+

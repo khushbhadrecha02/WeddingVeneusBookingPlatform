@@ -1,0 +1,127 @@
+﻿@using WeddingVeneus1.Areas.VenueDetails.Models;
+@using System.Data;
+@model VenueDetails_ViewModel;
+
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewBag.ShowIcon = true;
+}
+<div style="margin-top:60px">
+<partial name="_SearchFormPartial" />
+</div>
+
+
+<div class="container-fluid full-screen">
+    <div class="row">
+        <div class="pagetitle">
+            <h1>Venues</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueSearch">Home</a></li>
+                    
+                    <li class="breadcrumb-item active">Venues</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+        <div class="col-12">
+            <div class="row">
+                @foreach(DataRow dr in Model.VenueDetails.Rows)
+                {
+                <div class="col-lg-4 col-md-6 col-sm-12">
+
+                    <!-- Card with an image on top -->
+                    <div class="card">
+                            <img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" class="card-img-top" alt="..."style="height:35vh;overflow:hidden">
+                        <div class="card-body pt-3">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-6">
+                                        <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                            Venue Name
+                                        </h5>
+                                        <h6>@dr["VenueName"]</h6>
+                                        
+
+                                </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-6">
+                                        <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6;">
+                                            City
+                                        </h5>
+                                        <h6><i class="bi bi-geo-alt-fill"></i>@dr["CityName"]</h6>
+                                        
+
+                                    </div>
+                                   
+                                    <div class="col-lg-6 col-md-12 col-sm-6">
+                                        <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                            Category
+                                        </h5>
+                                        <h6><i class="bi bi-geo-alt-fill"></i>@dr["CategoryName"]</h6>
+                                    
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-6">
+                                        <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                            Guest Capacity
+                                        </h5>
+                                        <h6><i class="bi bi-geo-alt-fill"></i>@dr["GuestCapacity"]</h6>
+
+
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-6">
+                                        <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                            Rent Per Day
+                                        </h5>
+                                        <h6><i class="bi bi-geo-alt-fill"></i>@dr["RentPerDay"]</h6>
+                                    
+
+                                    </div>
+
+                            </div>
+
+                            
+                                <div style="text-align:center">
+                                    <a asp-area="VenueDetails" class="btn btn-danger" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" asp-route-CityID="@dr["CityID"]">More Details</a>
+                                </div>
+
+                    
+                            
+                        </div>
+                    </div><!-- End Card with an image on top -->
+                </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+</div>
+@section Scripts
+    {
+    <script>
+         function fnOnStateChange() {
+             var StateID = $(".StateID").val();
+             if (StateID !== "") {
+                 $(".CityID").empty();
+                 $(".CityID").append($("<option></option>").val("").html("Select City"));
+                 $.ajax({
+                     type: "POST",
+                     contentType: "application/json; charset=utf-8",
+                     url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+                     data: {},
+                     dataType: "json",
+                     success: function (Result) {
+                         $.each(Result, function (key, value) {
+                             $(".CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                         });
+                     },
+                     error: function (r) {
+                         alert("Error while loading combobox");
+                     }
+                 });
+             } else {
+                 $(".CityID").empty();
+                 $(".CityID").append($("<option></option>").val("").html("Select City"));
+             }
+         }
+    </script>
+}

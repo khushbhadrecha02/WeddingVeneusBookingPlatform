@@ -1,0 +1,404 @@
+﻿@using WeddingVeneus1.Areas.VenueDetails.Models;
+@using System.Data
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+
+@model VenueDetails_ViewModel
+@{
+    if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout1.cshtml";
+    }
+}
+
+<div class="container-fluid full-screen">
+    @if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+    {
+        <div class="pagetitle">
+            <h1>Venue Details</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueSearch">Home</a></li>
+                <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Index">Venues List</a></li>
+                <li class="breadcrumb-item active">Venue Details</li>
+            </ol>
+        </nav>
+        </div>
+    }
+    else
+    {
+    <div class="row"style="margin-top:60px">
+        <div class="pagetitle">
+            <h1>Venue Details</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueSearch">Home</a></li>
+                    <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search">Venues</a></li>
+                    <li class="breadcrumb-item active">Venue Details</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+    </div>
+    }
+    <div class="row">
+        <div class="col-md-9">
+            <!-- First column covering 70% of the screen -->
+            <div class="card">
+                <div class="card-body">
+                    
+
+                    <!-- Slides with indicators -->
+                    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" style="height:50vh;">
+                        <div class="carousel-indicators">
+                            @for (int i = 0; i < Model.Photos.Rows.Count; i++)
+                            {
+                                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@i" class="@((i == 0) ? "active" : "")" aria-current="true" aria-label="Slide @(i + 1)"></button>
+                            }
+                        </div>
+                        <div class="carousel-inner">
+                            @for (int i = 0; i < Model.Photos.Rows.Count; i++)
+                            {
+                                <div class="carousel-item @((i == 0) ? "active" : "")">
+                                    <img src="@Url.Content(Convert.ToString(Model.Photos.Rows[i]["PhotoPath"]))" class="d-block w-100" alt="Slide @(i + 1)"style="height:50vh;overflow:hidden">
+                                </div>
+                            }
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+
+                    </div><!-- End Slides with indicators -->
+            </div>
+        </div>
+        <div>
+            @foreach(DataRow dr in Model.VenueDetails.Rows)
+            {
+            <h5 class="card-title" style="margin-top:-30px">@Convert.ToInt32(dr["AreasCount"]) Event Areas Available</h5>
+            }
+        </div>
+            <div class="row">
+                @foreach (DataRow dr in Model.EventAreas.Rows)
+                {
+                    <div class="col-lg-6 col-md-12 col-sm-12 mb-2">
+                        <!-- Adjust the column widths as needed -->
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">@dr["AreaName"]</h5>
+                                <div class="row">
+                                    <div class="col-4 ">
+                                        <h6><i class="bi bi-house"></i> @dr["AreaType"]</h6>
+                                    </div>
+                                    <div class="col-4 ">
+                                        <h6><i class="bi bi-person-wheelchair"></i> @dr["SittingCapacity"] seats</h6>
+                                    </div>
+                                    <div class="col-4">
+                                        <h6 class=""><i class="bi bi-person-standing"></i> @dr["FloatingCapacity"] floating</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+
+
+
+
+
+            <div class="card">
+                <div class="card-body pt-2">
+            <div>
+                <h5 class="card-title">Photos Album</h5>
+            </div>
+
+                    <div class="row g-4">
+                        @foreach (DataRow dr in Model.Photos.Rows)
+                        {
+                            <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-3">
+                                <div class="card h-100">
+                                    <img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" class="card-img-top img-fluid h-100" alt="..." / style="overflow:hidden">
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    </div>
+                    </div>
+
+            
+                    
+
+                        
+                    
+
+                    
+
+                
+            
+                    @foreach (DataRow dr in Model.VenueDetails.Rows)
+                    {
+                    <div class="card">
+                    <div class="card-body pt-3">
+                        <div>
+                            <h5 class="card-title">About the Venue</h5>
+                        </div>
+                        <div>
+                            <h6>@dr["VenueDescription"]</h6>
+                        </div>
+                        <div>
+                            <h5 class="card-title">Venue Info</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-cast"></i> Air Conditioning
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["AirConditioned"]</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-egg-fried"></i> Cuisines Allowed
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["Cuisines"]</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-cup-straw"></i> Alcohol Policy
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["AlcoholPolicy"]</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-cookie"></i> Outside Decorators
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["OutsideDecoration"]</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-music-player-fill"></i> Dj Policy
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["DjPolicy"]</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-x-square"></i> Cancellation Policy
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["CancellationPolicy"]</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-p-circle"></i> Parking Space
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["BikeParking"]</li>
+                                    <li>@dr["CarParking"]</li>
+                                    <li>@dr["ValetParking"]</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-egg-fried"></i> Food
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["Food"]</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-p-circle"></i> Payment
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["AdvancePayment"]</li>
+                                    <li>@dr["PaymentAfterEvent"]</li>
+                                    
+                                </ul>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                    <i class="bi bi-egg-fried"></i> Rooms
+                                </strong>
+                                <ul style="margin-left:-12px">
+                                    <li>@dr["GuestRooms"]</li>
+                                    <li>@dr["ACRooms"]</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        @if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+                        {
+
+                            <div class="btn-group d-flex justify-content-center w-100">
+                                <a class="btn btn-primary btn-lg mx-2 d-none d-lg-block" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" asp-route-VenueID="@dr["VenueID"]">Update Venue Information</a>
+                                <a class="btn btn-secondary btn-lg mx-2 d-none d-lg-block" asp-area="EventAreas" asp-controller="Event" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Areas</a>
+                                <a class="btn btn-success btn-lg mx-2 d-none d-lg-block" asp-area="Photos" asp-controller="Photos" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Photos</a>
+                                <a class="btn btn-danger btn-lg mx-2 d-none d-lg-block" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Delete" asp-route-VenueID="@dr["VenueID"]">Delete Venue</a>
+
+                                <a class="btn btn-primary btn-md mx-1 d-none d-md-block d-lg-none" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" asp-route-VenueID="@dr["VenueID"]">Update Venue</a>
+                                <a class="btn btn-secondary btn-md mx-1 d-none d-md-block d-lg-none" asp-area="EventAreas" asp-controller="Event" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Areas</a>
+                                <a class="btn btn-success btn-md mx-1 d-none d-md-block d-lg-none" asp-area="Photos" asp-controller="Photos" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Photos</a>
+                                <a class="btn btn-danger btn-md mx-1 d-none d-md-block d-lg-none" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Delete" asp-route-VenueID="@dr["VenueID"]">Delete Venue</a>
+
+                                <a class="btn btn-primary btn-sm mx-1 d-block d-md-none" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" asp-route-VenueID="@dr["VenueID"]">Update Venue</a>
+                                <a class="btn btn-secondary btn-sm mx-1 d-block d-md-none" asp-area="EventAreas" asp-controller="Event" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Areas</a>
+                                <a class="btn btn-success btn-sm mx-1 d-block d-md-none" asp-area="Photos" asp-controller="Photos" asp-action="Index" asp-route-VenueID="@dr["VenueID"]">Update Photos</a>
+                                <a class="btn btn-danger btn-sm mx-1 d-block d-md-none" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Delete" asp-route-VenueID="@dr["VenueID"]">Delete Venue</a>
+                            </div>
+
+
+
+                        }
+                        </div>
+                        </div>
+                    }
+            
+
+        
+            @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+            {
+                <div class="container" id="scroll" style="overflow-x: auto; white-space: nowrap; position: relative;">
+                    <div class="scrolling-container" style="display: inline-block;">
+                        @foreach (DataRow dr in Model.VenueDetailByCityID.Rows)
+                        {
+                            <div class="card" style="display: inline-block; width: 20rem; height: 15rem;">
+                                <img src=" @Url.Content(Convert.ToString(dr["PhotoPath"]))" class="card-img-top" alt="..." style="height: 8rem;overflow:hidden">
+                                <div class="card-body">
+                                    <h5 class="card-title">@dr["VenueName"]</h5>
+                                    <p class="card-text">des</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                <button id="scrollLeft" style="position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1;">Scroll Left</button>
+                <button id="scrollRight" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); z-index: 1;">Scroll Right</button>
+            </div>
+            }
+
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body pt-3">
+                    <div  style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                        <i class="bi bi-house-door-fill"></i> Address
+
+                    </div>
+                    @foreach(DataRow dr in Model.VenueDetails.Rows)
+                    {
+                    <div >
+                       <h6>@dr["Address"]</h6> 
+                    </div>
+                    }
+                    <hr />
+                    <div class="row">
+                        @foreach (DataRow dr in Model.VenueDetails.Rows)
+                        {
+                            <div class="col-lg-6 col-md-12 ">
+                                <h6 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                     Rent Per Day
+                                </h6>
+                                <span style="display: block; margin-top: -10px; "><i class="bi bi-currency-rupee"></i>@dr["RentPerDay"]</span>
+                            </div>
+                            <div class="col-lg-6 col-md-12 ">
+                                <strong style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                     Contact No.
+                                </strong>
+                                <span style="display: block; margin-top: -6px;"><i class="bi bi-telephone"></i>@dr["ContactNo"]</span>
+                            </div>
+                        }
+                    </div>
+
+                    @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                    {
+                        @foreach (DataRow dr in Model.VenueDetails.Rows)
+                        {
+                            <div style="text-align:center">
+                                <a asp-area="Booking" asp-controller="Booking" asp-action="CheckBooking" asp-route-venueID="@dr["VenueID"]" asp-route-venueName="@dr["VenueName"]" class="btn btn-danger">Book Now</a>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            // Prevent default scrolling on card list
+            $('#scroll').css('overflow-x', 'hidden');
+
+            // Prevent touch/pointer scrolling on cards
+            $('.scrolling-container').on('touchmove pointermove', function (e) {
+                e.preventDefault();
+            });
+
+            // Button click events with dynamic overflow control
+            $('#scrollLeft').on('click', function () {
+                $('#scroll').css('overflow-x', 'auto'); // Enable scrolling temporarily
+                $('#scroll').animate({ scrollLeft: '-=100' }, 'slow', function () {
+                    $('#scroll').css('overflow-x', 'hidden'); // Disable scrolling after animation
+                });
+            });
+
+            $('#scrollRight').on('click', function () {
+                $('#scroll').css('overflow-x', 'auto'); // Enable scrolling temporarily
+                $('#scroll').animate({ scrollLeft: '+=100' }, 'slow', function () {
+                    $('#scroll').css('overflow-x', 'hidden'); // Disable scrolling after animation
+                });
+            });
+
+            // Update button positions on scroll
+            $('#scroll').on('scroll', function () {
+                var scrollLeft = $(this).scrollLeft();
+                $('#scrollLeft').css('left', scrollLeft);
+                $('#scrollRight').css('right', -scrollLeft);
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

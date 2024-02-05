@@ -1,0 +1,93 @@
+﻿@using WeddingVeneus1.Areas.Photos.Models;
+@model PhotosModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="pagetitle">
+    <h1>Form Layouts</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Forms</li>
+            <li class="breadcrumb-item active">Layouts</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-6">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Horizontal Form</h5>
+
+                    <!-- Horizontal Form -->
+                    <!-- Your existing form -->
+                    <form asp-area="Photos" asp-controller="Photos" asp-action="Save" enctype="multipart/form-data"  id="mainForm" method="post" >
+                        <!-- Existing form fields -->
+                        <div class="row mb-3">
+
+                            <label class="ms-2">Venue Name</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="VenueID" asp-items="@(new SelectList(ViewBag.VenueList,"VenueID","VenueName"))">
+
+                                    <option value="">Select Venue</option>
+                                </select>
+                                <span asp-validation-for="VenueID" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label asp-for="PhotoPath" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="file" asp-for="FilePath" class="form-control" id="inputText" multiple>
+                            </div>
+                            <span asp-validation-for="FilePath" class="text-danger"></span>
+                        </div>
+                        
+
+                        <!-- Container to hold dynamically added fields -->
+                        <div id="dynamicFieldsContainer"></div>
+
+                        <!-- Add button to trigger dynamic addition of fields -->
+                        <input type="submit" class="btn btn-primary" value="Submit" />
+                        <button type="button" id="addButton" class="btn btn-secondary">Add</button>
+                        
+                       <a class="btn btn-success" asp-area="Photos" asp-controller="Photos" asp-action="Create">Add Photos</a>
+
+                    </form>
+
+
+                </div>
+            </div>
+            @section Scripts{
+                @{
+                    <partial name="_ValidationScriptsPartial" />
+                }
+                <script>
+                    $(document).ready(function () {
+                        let counter = 1; // Initialize a counter for unique field names
+
+                        $("#addButton").on("click", function () {
+                            var newFields = `
+                                                        <div class="row mb-3">
+                                                            <label class="col-sm-2 col-form-label"></label>
+                                                            <div class="col-sm-10">
+                                                            <input type="file" asp-for="FilePath" class="form-control" name="FilePath[${counter}]" />
+                                                            </div>
+                                                        
+                                                        `;
+
+                            $("#dynamicFieldsContainer").append(newFields);
+
+                            counter++; // Increment counter for the next set of fields
+                        });
+                    });
+                </script>
+
+
+
+
+
+            }
+

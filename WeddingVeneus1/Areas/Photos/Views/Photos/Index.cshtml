@@ -1,0 +1,106 @@
+﻿@using System.Data
+@model DataTable
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="pagetitle">
+    <h1>Data Tables</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Tables</li>
+            <li class="breadcrumb-item active">Data</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            
+
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-header text-primary"><strong>Venue Photos List</strong></h1>
+                    <div class="row card-header">
+                        <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
+                        <div class="col-3 justify-content-end text-end">
+                            <a asp-area="Photos" asp-controller="Photos" asp-action="Photos" class="btn shadow border btn-success col-9">
+                                <i class="bi bi-plus-circle"></i>   Add New Photo
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">VenueID</th>
+                                <th scope="col">VenueName</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Modified</th>
+                                <th scope="col"></th>
+
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+
+                            @foreach (DataRow dr in Model.Rows)
+                            {
+                               
+                                <tr>
+                                    <th scope="row">@dr["VenueID"]</th>
+                                    
+                                    
+                                    
+                                    <td><img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" class="my-3" alt="Profile" height="100"  width="100"></td>
+                                    <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yy")</td>
+                                    <td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yy")</td>
+
+                                    <td>
+                                        <div >
+                                            <a asp-area="Photos" asp-controller="Photos" asp-action="Update" asp-route-PhotoID="@dr["PhotoID"]" class="btn btn-primary mx-2">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+
+                                            <a asp-area="Photos" asp-controller="Photos" asp-action="Delete" asp-route-PhotoID="@dr["PhotoID"]" class="btn btn-danger mx-2" onclick="fun1()">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </a>
+
+                                            
+
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                            }
+                        </tbody>
+                        </table>
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        </section>
+
+                        @section Scripts
+                            {
+                            <script>
+                                $(document).ready(function () {
+                                    $("#Sample_1").on("keyup", function () {
+                                        var value = $(this).val().toLowerCase();
+                                        $("#Sample_2 tr").filter(function () {
+                                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                                        });
+                                    });
+                                });
+                                function fun1() {
+                                    if (confirm("Are you sure you want to delete?")) {
+                                        return true;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+                                }
+                            </script>
+                        }

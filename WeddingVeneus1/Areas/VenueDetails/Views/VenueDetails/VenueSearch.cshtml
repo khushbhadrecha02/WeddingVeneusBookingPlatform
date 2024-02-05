@@ -1,0 +1,184 @@
+﻿@using WeddingVeneus1.Areas.VenueDetails.Models;
+@using System.Data;
+@model VenueDetails_ViewModel;
+
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewBag.ShowIcon = false; // Set this value based on your condition
+
+
+
+}
+<partial name="_SearchFormPartial" />
+
+
+    <div class="row">
+        <div class="col">
+            <!-- Card with an image overlay -->
+            <div class="card" style="height:50vh">
+                <img src="~/assets/img/Background2.jpg" class="card-img-top" alt="..." style="height:50vh;overflow:hidden;position:relative">
+                <div class="card-img-overlay" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <h1 class="card-title" style="font-weight:1000;font-size:xx-large;color:white">India's Largest Wedding Venue Booking</h1>
+                    <h1 class="card-title" style="font-weight:1000;font-size:xx-large;margin-top:-40px;color:white">Platform with 40000+ venues</h1>
+                    <div style="position: absolute; bottom: -65px; width: 95%; text-align: center;">
+
+                    <div class="card d-none d-md-block d-lg-block d-sm-none">
+                            <div class="card-title">
+                                <div class="container">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
+                                                <div class="row align-items-center justify-content-center">
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <select class="form-select StateID"  asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
+                                                            <option value="">Select State</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12 ">
+                                                        <select class="form-select CityID"  asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
+                                                            <option value="">Select City</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <select class="form-select" asp-for="@Model.venue_Search_Model.CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
+                                                            <option value="">Select Category</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" asp-for="@Model.venue_Search_Model.RentPerDay" class="form-control" placeholder="RentPerDay" />
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" asp-for="@Model.venue_Search_Model.GuestCapacity"  class="form-control" placeholder="Guest Capacity" />
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <button type="submit" class="btn btn-danger btn-block">Find Venues</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                            </div>
+                        
+                    
+                </div>
+                
+            </div><!-- End Card with an image overlay -->
+
+        </div>
+    
+    <div class="card-title">
+        Wedding Venues By City
+    </div>
+<div class="container" id="scroll" style="overflow-x: auto; white-space: nowrap; position: relative;">
+    <div class="scrolling-container" style="display: inline-block;" >
+            @foreach (DataRow dr in Model.City.Rows)
+            {
+            <div class="card" style="display: inline-block; width: 11rem; height: 12rem;">
+                    <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+
+                     <img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" alt="Profile" class="rounded-circle" style="height:7rem;width:7rem;overflow:hidden">
+                        <h5 style="text-align:center">@dr["CityName"]</h5>
+
+                        <h6 style="text-align:center">@dr["VenueCount"]</h6>
+
+                        
+                    </div>
+                </div>
+            }
+        </div>
+        <button id="scrollLeft" class="btn btn-transparent " style="position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1;"><i class="bi bi-arrow-left-circle"></i></button>
+        <button id="scrollRight" class="btn btn-transparent" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); z-index: 1;"><i class="bi bi-arrow-right-circle"></i></i></button>
+    </div>
+    <div class="card-title">
+        Wedding Venues By Category
+    </div>
+    <div class="container" id="scroll" style="overflow-x: auto; white-space: nowrap; position: relative;">
+        <div class="scrolling-container" style="display: inline-block;">
+            @foreach (DataRow dr in Model.Category.Rows)
+            {
+                <div class="card" style="display: inline-block; width: 11rem; height: 12rem;">
+                    <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+
+                        <img src="@Url.Content(Convert.ToString(dr["CategoryPhoto"]))" alt="Profile" class="rounded-circle" style="height:7rem;width:7rem;overflow:hidden">
+                        <h5 style="text-align:center">@dr["CategoryName"]</h5>
+
+                        <h6 style="text-align:center">@dr["VenueCount"]</h6>
+
+
+                    </div>
+                </div>
+            }
+        </div>
+        <button id="scrollLeft" class="btn btn-transparent " style="position: absolute; top: 50%; left: 0; transform: translateY(-50%); z-index: 1;"><i class="bi bi-arrow-left-circle"></i></button>
+        <button id="scrollRight" class="btn btn-transparent" style="position: absolute; top: 50%; right: 0; transform: translateY(-50%); z-index: 1;"><i class="bi bi-arrow-right-circle"></i></i></button>
+    </div>
+    </div>
+@section Scripts
+{<script>
+  
+         $(document).ready(function () {
+             // Prevent default scrolling on card list
+             $('#scroll').css('overflow-x', 'hidden');
+
+             // Prevent touch/pointer scrolling on cards
+             $('.scrolling-container').on('touchmove pointermove', function (e) {
+                 e.preventDefault();
+             });
+
+             // Button click events with dynamic overflow control
+             $('#scrollLeft').on('click', function () {
+                 $('#scroll').css('overflow-x', 'auto'); // Enable scrolling temporarily
+                 $('#scroll').animate({ scrollLeft: '-=100' }, 'slow', function () {
+                     $('#scroll').css('overflow-x', 'hidden'); // Disable scrolling after animation
+                 });
+             });
+
+             $('#scrollRight').on('click', function () {
+                 $('#scroll').css('overflow-x', 'auto'); // Enable scrolling temporarily
+                 $('#scroll').animate({ scrollLeft: '+=100' }, 'slow', function () {
+                     $('#scroll').css('overflow-x', 'hidden'); // Disable scrolling after animation
+                 });
+             });
+
+             // Update button positions on scroll
+             $('#scroll').on('scroll', function () {
+                 var scrollLeft = $(this).scrollLeft();
+                 $('#scrollLeft').css('left', scrollLeft);
+                 $('#scrollRight').css('right', -scrollLeft);
+             });
+         });
+         function fnOnStateChange() {
+             var StateID = $(".StateID").val();
+             if (StateID !== "") {
+                 $(".CityID").empty();
+                 $(".CityID").append($("<option></option>").val("").html("Select City"));
+                 $.ajax({
+                     type: "POST",
+                     contentType: "application/json; charset=utf-8",
+                     url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+                     data: {},
+                     dataType: "json",
+                     success: function (Result) {
+                         $.each(Result, function (key, value) {
+                             $(".CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                         });
+                     },
+                     error: function (r) {
+                         alert("Error while loading combobox");
+                     }
+                 });
+             } else {
+                 $(".CityID").empty();
+                 $(".CityID").append($("<option></option>").val("").html("Select City"));
+             }
+         }
+         
+</script>
+    
+}

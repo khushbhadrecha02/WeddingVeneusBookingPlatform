@@ -1,0 +1,317 @@
+﻿@using WeddingVeneus1.Areas.Booking.Models;
+@model BookingModel
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div class="pagetitle">
+    <h1>Form Layouts</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Forms</li>
+            <li class="breadcrumb-item active">Layouts</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section">
+    <div class="row">
+        <div class="col-lg-6">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Book Venue</h5>
+
+                    <!-- Horizontal Form -->
+                    <form asp-area="Booking" asp-controller="Booking" asp-action="Create" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div class="row mb-3">
+                            <input asp-for="VenueID"   id="VenueID" hidden/>
+                            <input asp-for="UserID" hidden />
+                            <input asp-for="DefaultAdvancePayPer" hidden />
+                            
+                            
+                            
+
+                            
+                            
+                            <label asp-for="UserName" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="UserName" class="form-control" id="inputText" readonly>
+                            </div>
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+                            
+
+                            <label asp-for="VenueName" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="VenueName" class="form-control" id="inputText" readonly>
+                            </div>
+                            <span asp-validation-for="VenueName" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">  
+
+
+                            <label asp-for="RentPerDay" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="RentPerDay" class="form-control" id="rentPerDay" readonly>
+                            </div>
+                            <span asp-validation-for="RentPerDay" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="NumOfDays" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="number" asp-for="NumOfDays" class="form-control" id="numberOfDays" readonly>
+                            </div>
+                            <span asp-validation-for="NumOfDays" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="Amount" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="number" asp-for="Amount" class="form-control" id="amount" readonly>
+                            </div>
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="AdvancePaymentPer" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="AdvancePaymentPer" class="form-control" id="advancePaymentPer" readonly>
+                            </div>
+                            <span asp-validation-for="AdvancePaymentPer" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="PaymentAfterEventPer" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="PaymentAfterEventPer" class="form-control" id="paymentAfterEventPer"readonly>
+                            </div>
+                            <span asp-validation-for="PaymentAfterEventPer" class="text-danger"></span>
+                        </div>
+                        @* <h1>@Model.AdvancePayment</h1>
+                        <h1>@Model.PaymentAfterEvent</h1> *@
+                        <div class="row mb-3">
+
+
+                            <label asp-for="AdvancePayment" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="number" asp-for="AdvancePayment" class="form-control" id="advancePayment" >
+                            </div>
+                            <span asp-validation-for="AdvancePayment" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="PaymentAfterEvent" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="number" asp-for="PaymentAfterEvent" class="form-control" id="paymentAfterEvent" readonly>
+                            </div>
+                            <span asp-validation-for="PaymentAfterEvent" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="BookingStartDate" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="BookingStartDate"  class="form-control" id="inputStartDate" readonly />
+
+                            </div>
+                            <span  class="text-danger" asp-validation-for="BookingStartDate"></span>
+                        </div>
+                        <div class="row mb-3">
+
+
+                            <label asp-for="BookingEndDate" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="BookingEndDate"  class="form-control" id="inputEndDate" readonly/>
+                            </div>
+                            <span class="text-danger" asp-validation-for="BookingEndDate"></span>
+                        </div>
+                        <h1 id="StatusMessage"></h1>
+
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Book</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </form><!-- End Horizontal Form -->
+
+                </div>
+            </div>
+            @section scripts {
+                
+                
+                <script>
+                    $(document).ready(function () {
+
+                        $('#numberOfDays').change(function () {
+                            var rentPerDay = $('#rentPerDay').val();
+                            console.log(rentPerDay);
+
+                            var numberOfDays = $('#numberOfDays').val();
+                            console.log(numberOfDays);
+
+                            $.ajax({
+                                url: '@Url.Action("CalculateAmount", "Booking")',
+                                type: 'GET',
+                                data: { NumberOfDays: numberOfDays, RentPerDay: rentPerDay },
+                                success: function (result) {
+                                    if (result.success === true) {
+                                        $("#amount").val(result.data).trigger('change');
+
+                                    } else {
+                                        console.error(result.error);
+                                    }
+                                },
+                                error: function () {
+                                    console.log("An error occurred while calculating booking amount.");
+                                }
+                            });
+
+                        });
+                    });
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        $('#advancePayment').change(function () {
+                            var advancePayment = $('#advancePayment').val();
+                            console.log(advancePaymentPer);
+
+
+                            var amount = $('#amount').val();
+                            console.log(amount);
+
+                            $.ajax({
+                                url: '@Url.Action("CalculateAdvancePaymentPer", "Booking")',
+                                type: 'GET',
+                                data: { AdvancePayment: advancePayment, Amount: amount },
+                                success: function (result) {
+                                    if (result.success === true) {
+                                        $("#advancePaymentPer").val(result.advancePaymentPer);
+                                        console.log(result.advancePayment);
+                                        $("#paymentAfterEventPer").val(result.paymentAfterEventPer);
+                                        console.log(result.paymentAfterEventPer);
+                                        $("#paymentAfterEvent").val(result.paymentAfterEvent);
+                                        console.log(result.paymentAfterEvent);
+
+                                    } else {
+                                        console.error(result.error);
+                                    }
+                                },
+                                error: function () {
+                                    console.log("An error occurred while calculating Advance amount.");
+                                }
+                            });
+                        });
+                    });
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        $('#amount').change(function () {
+                            var advancePaymentPer = $('#advancePaymentPer').val();
+                            console.log(advancePaymentPer);
+
+
+                            var amount = $('#amount').val();
+                            console.log(amount);
+
+                            $.ajax({
+                                url: '@Url.Action("CalculateAdvancePayment", "Booking")',
+                                type: 'GET',
+                                data: { AdvancePaymentPer: advancePaymentPer, Amount: amount },
+                                success: function (result) {
+                                    if (result.success === true) {
+                                        $("#advancePayment").val(result.advancePayment);
+                                        console.log(result.advancePayment);
+                                        $("#paymentAfterEvent").val(result.paymentAfterEvent);
+                                        console.log(result.paymentAfterEventPer);
+
+
+                                    } else {
+                                        console.error(result.error);
+                                    }
+                                },
+                                error: function () {
+                                    console.log("An error occurred while calculating Advance amount.");
+                                }
+                            });
+                        });
+                    });
+                </script>
+                <script>
+                    $(document).ready(function () {
+                        // Function to calculate and update NumberOfDays
+                        function calculateAndSetNumberOfDays() {
+                            // Get the date values as strings from the input fields
+                            var startDateStr = $('#inputStartDate').val();
+                            var endDateStr = $('#inputEndDate').val();
+
+                            console.log("Start Date: " + startDateStr);
+                            console.log("End Date: " + endDateStr);
+
+                            // Split the date strings into arrays [day, month, year]
+                            var startDateParts = startDateStr.split('-');
+                            var endDateParts = endDateStr.split('-');
+
+                            // Parse day, month, and year directly from the strings
+                            var startDay = parseInt(startDateParts[0]);
+                            var startMonth = parseInt(startDateParts[1]);
+                            var startYear = parseInt(startDateParts[2]);
+
+                            var endDay = parseInt(endDateParts[0]);
+                            var endMonth = parseInt(endDateParts[1]);
+                            var endYear = parseInt(endDateParts[2]);
+
+                            console.log("Start Date (parsed): " + startDay + "-" + startMonth + "-" + startYear);
+                            console.log("End Date (parsed): " + endDay + "-" + endMonth + "-" + endYear);
+
+                            // Check if all parts are valid integers
+                            if (!isNaN(startDay) && !isNaN(startMonth) && !isNaN(startYear) &&
+                                !isNaN(endDay) && !isNaN(endMonth) && !isNaN(endYear)) {
+
+                                // Calculate the actual number of days, considering both start and end dates as full days
+                                var actualNumberOfDays = Math.abs((endDay - startDay) + 1);
+
+                                console.log("Actual Days: " + actualNumberOfDays);
+
+                                // Update NumberOfDays if it's different
+                                
+
+                                
+                                    $('#numberOfDays').val(actualNumberOfDays);
+
+                                    // Trigger the change event to recalculate amounts
+                                    $('#numberOfDays').trigger('change');
+                                
+                            } else {
+                                console.log("Invalid date format.");
+                            }
+                        }
+
+                        // Initial calculation on page load
+                        calculateAndSetNumberOfDays();
+                    });
+                </script>
+                
+
+
+
+
+
+
+
+
+
+
+
+            }
+
+            

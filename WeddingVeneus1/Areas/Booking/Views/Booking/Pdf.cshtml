@@ -1,0 +1,133 @@
+﻿@using WeddingVeneus1.Areas.Booking.Models;
+@model BookingModel;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WeddingVenues2</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WeddingVenues2.styles.css" asp-append-version="true" />
+
+</head>
+<body>
+    
+
+    <!-- Your existing content here -->
+    
+
+
+<div style="margin-top: 40px; background-color: #eee;" class="col-lg-6">
+    <div style="box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%); position: relative; display: flex; flex-direction: column; min-width: 0; word-wrap: break-word; background-color: #fff; background-clip: border-box; border: 0 solid rgba(0,0,0,.125); border-radius: 1rem;">
+        <div style="flex: 1;">
+            <div style="padding: 20px;">
+                <div style="text-align: right;">
+                    <h4 style="float: right; margin: 0;font-size:30px">GSTNO. 00AAECR2971C17 </h4>
+                        
+                    <!-- Commented out the Bootdey.com line -->
+                    <!-- <div style="margin-bottom: 4px;">
+                        <h2 style="margin: 0 0 1px; color: #6c757d;">Bootdey.com</h2>
+                    </div> -->
+
+                </div>
+                <div>
+                        <h4 style="margin: 0 0 1px;font-size:30px">Mandap.Com</h4>
+
+                    <h4 style="margin: 0 0 1px;font-size:30px">3184 Marine Drive Mumbai, Mu 15201</h4>
+                        <h4 style="margin: 0 0 1px;font-size:30px" > mandapbookingplatform@gmail.com</h4>
+                        <h4 style="margin: 0 0 1px;font-size:30px">222-666-2222</h4>
+                </div>
+
+                <hr style="margin: 20px 0;">
+                    
+                        <div style="text-align: right;">
+                        <h4 style="margin: 0 0 1px;font-size:30px; margin-bottom: 5px;">Booking ID:</h4>
+                            <h4 style="margin-bottom:5px;font-size:30px">@Model.BookingID</h4>
+                        <h4 style="margin-bottom:0 0 1px; margin-bottom: 5px;font-size:30px">Invoice No:</h4>
+                        <h4 style="margin-bottom:0 0 1px;margin-bottom: 5px;font-size:30px">@Model.PaymentID</h4>
+                        <h4 style="margin-bottom:0 0 1px;margin-bottom: 5px;font-size:30px">Invoice Date:</h4>
+                        <h4 style="margin-bottom: 0 0 1px;margin-bottom: 5px;font-size:30px">@Model.PaymentDate</h4>
+                        </div>
+                        <div style="text-align: left;">
+                        <h4 style="margin: 0 0 1px;font-size: 30px; margin-bottom: 5px;">Billed To:</h4>
+                        <h4 style="margin: 0 0 1px;margin-bottom: 5px;font-size: 30px;">@Model.UserName</h4>
+                        <h4 style="margin: 0 0 1px;margin-bottom: 5px;font-size: 30px;">@Model.Email</h4>
+                        <h4 style="margin: 0 0 1px;margin-bottom: 5px;font-size: 30px;">@Model.ContactNO</h4>
+                        </div>
+                    
+
+
+                    
+
+
+
+                <div style="padding-top: 2px;">
+                    <h5 style="font-size: 30px;">Booking Summary</h5>
+
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 0;" border="1">
+                            <thead>
+                                <tr>
+                                    <th style="width: 70px;font-size:30px">No.</th>
+                                    <th style="font-size:30px;">VenueName</th>
+                                    <th style ="font-size:30px;">BookingStartDate</th>
+                                    <th style="font-size:30px;">BookingEndDate</th>
+                                        <th style="text-align: right; width: 120px;font-size:30px;">NumberOfDays</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                        <td scope="row" style="font-size:30px;text-align:center">01</td>
+                                    <td style="font-size:30px;text-align:center">
+                                        
+                                            @Model.VenueName
+
+                                        
+                                    </td>
+                                    <td style="font-size:30px;text-align:center">@Model.BookingStartDate</td>
+                                    <td style="font-size:30px;text-align:center" >@Model.BookingEndDate</td>
+                                    <td style="font-size:30px;text-align:center">@Model.NumOfDays</td>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right;font-size:30px;border:0">Total Amount:</th>
+                                        <td style="text-align: right;font-size:30px;border:0"><i class="bi bi-currency-rupee"></i>@Model.Amount</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;font-size:30px">Amount Paid:</th>
+                                    <td style="text-align: right; border: 0;font-size:30px"><i class="bi bi-currency-rupee"></i>-@Model.AdvancePayment</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;font-size:30px">Pending Amount :</th>
+                                        <td style="text-align: right; border: 0;font-size:30px;" >@Model.PaymentAfterEvent</td>
+                                </tr>
+
+                                <tr>
+                                    
+                                    <th scope="row" colspan="4" style="text-align: right; border: 0;font-size:30px">Paid:</th>
+                                    <td style="text-align: right; border: 0;font-size:30px;">@Model.PaymentAmount</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 4px;">
+                        <div class="d-print-none">
+                            <div style="text-align: right;">
+                                <a id="gen" style="background-color: #28a745; color: #fff; margin-right: 1px; padding: 6px 12px; text-decoration: none; font-size: 12px;"><i class="fa fa-print"></i></a>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+
+

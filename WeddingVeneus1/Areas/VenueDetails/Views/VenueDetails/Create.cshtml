@@ -1,0 +1,279 @@
+﻿@using WeddingVeneus1.Areas.VenueDetails.Models;
+@model VenueDetailsModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="pagetitle">
+    <h1>Form Layouts</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Forms</li>
+            <li class="breadcrumb-item active">Layouts</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Horizontal Form</h5>
+
+                    <!-- Horizontal Form -->
+                    <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Save" enctype="multipart/form-data">
+                        <div class="row mb-6">
+                            <input asp-for="VenueID" hidden />
+                            <label asp-for="VenueName" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="VenueName" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="VenueName" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label class="ms-2">State Name</label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
+                                    
+                                    <option value="">Select State</option>
+                                </select>
+                                <span asp-validation-for="StateID" class="text-danger"></span>
+
+                            </div>
+                        </div>
+                        <label class="ms-2">City Name</label>
+                        <div class="col-sm-10">
+                            <select class="form-select" asp-for="CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
+                                <option value="">Select City</option>
+                            </select> 
+                            <span asp-validation-for="StateID" class="text-danger"></span>
+
+                        </div>
+                        
+
+                            
+                            <div class="col-sm-10">
+                            <label class="ms-2">Category Name</label>
+                            <select class="form-select" asp-for="CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
+                                    
+                                    <option value="">Select Category</option>
+                                </select>
+                                <span asp-validation-for="CategoryID" class="text-danger"></span>
+
+                            </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" asp-for="Cuisines"></label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="Cuisines" aria-label="Default select example">
+                                    <option selected>Select Available Cuisines</option>
+                                    <option value="Veg And Non Veg">Veg And Non Veg</option>
+                                    <option value="Only Veg">Only Veg</option>
+                                    
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" asp-for="DJPolicy"></label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="DJPolicy" aria-label="Default select example">
+                                    <option selected>Select DJPolicy</option>
+                                    <option value="Outside Dj Allowed">Outside Dj Allowed</option>
+                                    <option value="Outside Dj Not Allowed">Outside Dj Not Allowed</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" asp-for="AlcoholPolicy"></label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="AlcoholPolicy" aria-label="Default select example">
+                                    <option selected>Select Alcohol Policy</option>
+                                    <option value="Alcohol Consumption is allowed.">Alcohol Consumption is allowed.</option>
+                                    <option value="Alcohol Consumption is not allowed.">Alcohol Consumption is not allowed.</option>
+                                    <option value="Alcohol Consumption is allowed but outside alcohol is not allowed.">Alcohol Consumption is allowed but outside alcohol is not allowed.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="col-sm-2 col-form-label" asp-for="OutsideDecoration"></label>
+                            <div class="col-sm-10">
+                                <select class="form-select" asp-for="OutsideDecoration" aria-label="Default select example">
+                                    <option selected>Select Outside Decoration Policy</option>
+                                    <option value="Outside Decoration Allowed.">Outside Decoration Allowed.</option>
+                                    <option value="Outside Decoration Not Allowed.">Outside Decoration Not Allowed.</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            
+                            <label asp-for="GuestCapacity" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="GuestCapacity" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="GuestCapacity" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="GuestRooms" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="GuestRooms" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="GuestRooms" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="ACRooms" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="ACRooms" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="ACRooms" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="BikeParking" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="BikeParking" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="BikeParking" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="CarParking" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="CarParking" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="CarParking" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="ValetParking" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="ValetParking" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="ValetParking" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="AdvancePayment" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="AdvancePayment" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="AdvancePayment" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="PaymentAfterEvent" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="PaymentAfterEvent" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="PaymentAfterEvent" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="CancellationPolicy" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="CancellationPolicy" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="CancellationPolicy" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="VenueDescription" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                            <textarea asp-for="VenueDescription" class="form-control" id="inputText"></textarea>
+                            </div>
+                            <span asp-validation-for="VenueDescription" class="text-danger"></span>
+                        </div>
+                        
+                        <fieldset class="row mb-3">
+                            <legend class="col-form-label col-sm-2 pt-0">AirConditioned</legend>
+                            <div class="col-sm-10">
+                                <div class="form-check">
+                                    <input type="radio" id="radioTrue" name="AirConditioned" value="true" asp-for="AirConditioned">
+
+                                    <label class="form-check-label" for="gridRadios1">
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="radio" id="radioFalse" name="AirConditioned" value="false" asp-for="AirConditioned">
+
+                                    <label class="form-check-label" for="gridRadios2">
+                                        No  
+                                    </label>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                        <div class="row mb-3">
+
+                            <label asp-for="ContactNO" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="ContactNO" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="ContactNO" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="RentPerDay" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="RentPerDay" class="form-control" id="inputText" >
+                            </div>
+                            <span asp-validation-for="RentPerDay" class="text-danger"></span>
+                        </div>
+                        <div class="row mb-3">
+
+                            <label asp-for="Address" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="Address" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                       
+                        
+                
+
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                            <a class="btn btn btn-success" asp-area="EventAreas" asp-controller="Event" asp-action="Create" >Add Event Areas</a>
+                        </div>
+                    </form><!-- End Horizontal Form -->
+
+                </div>
+            </div>
+            @section Scripts{
+                @{
+                    <partial name="_ValidationScriptsPartial" />
+                }
+            }
+            <script>
+                function fnOnStateChange() {
+                    var StateID = $("#StateID").val();
+                    if (StateID !== "") {
+                        $("#CityID").empty();
+                        $("#CityID").append($("<option></option>").val("").html("Select City"));
+                        $.ajax({
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+                            data: {},
+                            dataType: "json",
+                            success: function (Result) {
+                                $.each(Result, function (key, value) {
+                                    $("#CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                                });
+                            },
+                            error: function (r) {
+                                alert("Error while loading combobox");
+                            }
+                        });
+                    } else {
+                        $("#CityID").empty();
+                        $("#CityID").append($("<option></option>").val("").html("Select City"));
+                    }
+                }
+            </script>
