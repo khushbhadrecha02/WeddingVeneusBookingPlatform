@@ -9,22 +9,20 @@ using WeddingVeneus1.Areas.Booking.Models;
 using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.VenueDetails.Models;
 using WeddingVeneus1.DAL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Web;
+
 using DinkToPdf;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Humanizer.Localisation.TimeToClockNotation;
+using MimeKit;
+using MailKit.Net.Smtp;
 
 namespace WeddingVeneus1.Areas.Booking.Controllers
 {
     [Area("Booking")]
     [Route("Booking/{Controller}/{Action}")]
-    public class BookingController : Controller
+    public class BookingController : Microsoft.AspNetCore.Mvc.Controller
     {
         #region GloblaStateDalObject
         Booking_DALBase dal = new Booking_DALBase();
@@ -306,7 +304,7 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return Json(new { success = false, });
             }
         }
-        [HttpPost]
+        [Microsoft.AspNetCore.Mvc.HttpPost]
         public IActionResult Create(BookingModel bookingModel) 
         {
             
@@ -344,14 +342,15 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             }
 
         }
-        public IActionResult PaymentPage(int bookingID,decimal? advancePayment)
+        public IActionResult PaymentPage(int bookingID,decimal? advancePayment,int? CancelID)
         {
+            Console.WriteLine(CancelID);
            DataTable dt =  dal.PR_Booking_SelectByPK(bookingID);
             BookingModel modelBooking = new BookingModel();
             foreach (DataRow dr in dt.Rows)
             {
                 modelBooking.BookingID = Convert.ToInt32(dr["BookingID"]);
-                modelBooking.UserID = Convert.ToInt32(dr["UserID"]);
+                
                 modelBooking.Amount = Convert.ToDecimal(dr["Amount"]);
                 modelBooking.VenueID = Convert.ToInt32(dr["VenueID"]);
                 modelBooking.VenueName = Convert.ToString(dr["VenueName"]);
@@ -360,14 +359,20 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 modelBooking.BookingEndDate = Convert.ToDateTime(dr["BookingEndDate"]);
                 modelBooking.NumOfDays = Convert.ToInt32(dr["NumberOfDays"]);
                 
+                
                 modelBooking.PaymentAfterEvent = Convert.ToDecimal(dr["PaymentAfterEvent"]);
                 modelBooking.PaymentStatus = Convert.ToString(dr["PaymentStatus"]);
                 modelBooking.UserName = Convert.ToString(dr["UserName"]);
                 modelBooking.ContactNO = Convert.ToString(dr["ContactNO"]);
                 modelBooking.Email = Convert.ToString(dr["Email"]);
             }
-            
+            modelBooking.UserID = HttpContext.Session.GetInt32("UserID").Value;
 
+
+            if (CancelID != null)
+            {
+                modelBooking.CancelID = CancelID;
+            }
             if(advancePayment != null)
             {
                 modelBooking.AdvancePayment = advancePayment;
@@ -377,18 +382,25 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
         [HttpPost]
         public IActionResult PaymentPage(BookingModel bookingModel)
         {
-            
+            if(bookingModel.CancelID != null)
+            {
+                dal.InsertPaymentRefunded(bookingModel);
+            }
+            else
+            {
                 dal.InsertPayment(bookingModel);
-            DataTable dt = dal.PR_Booking_SelectByPK(bookingModel.BookingID);
+            }
+            
+                
+            DataTable dt = dal.PR_Payment_SelectByPK(bookingModel.PaymentID);
             
             foreach (DataRow dr in dt.Rows)
             {
                 bookingModel.BookingID = Convert.ToInt32(dr["BookingID"]);
                 bookingModel.UserID = Convert.ToInt32(dr["UserID"]);
                 bookingModel.Amount = Convert.ToDecimal(dr["Amount"]);
-                bookingModel.VenueID = Convert.ToInt32(dr["VenueID"]);
-                bookingModel.VenueName = Convert.ToString(dr["VenueName"]);
-                bookingModel.ISBooked = Convert.ToBoolean(dr["ISBooked"]);
+
+
                 bookingModel.BookingStartDate = Convert.ToDateTime(dr["BookingStartDate"]);
                 bookingModel.BookingEndDate = Convert.ToDateTime(dr["BookingEndDate"]);
                 bookingModel.NumOfDays = Convert.ToInt32(dr["NumberOfDays"]);
@@ -396,10 +408,17 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                      bookingModel.AdvancePayment = Convert.ToDecimal(dr["AdvancePayment"]);
                 
                 bookingModel.PaymentAfterEvent = Convert.ToDecimal(dr["PaymentAfterEvent"]);
-                bookingModel.PaymentStatus = Convert.ToString(dr["PaymentStatus"]);
+                bookingModel.PaymentAmount = Convert.ToDecimal(dr["PaymentAmount"]);
+
                 bookingModel.UserName = Convert.ToString(dr["UserName"]);
                 bookingModel.ContactNO = Convert.ToString(dr["ContactNO"]);
                 bookingModel.Email = Convert.ToString(dr["Email"]);
+            }
+            DataTable dt1 = dal.PR_Booking_SelectByPK(bookingModel.BookingID);
+            foreach(DataRow dr in  dt1.Rows)
+            {
+                bookingModel.VenueName = Convert.ToString(dr["VenueName"]);
+                bookingModel.Receiver = Convert.ToString(dr["UserName"]);
             }
 
 
@@ -427,37 +446,124 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             
             
         }
-        public async Task<IActionResult> GeneratePdf(int BookingID,int PaymentID)
+        public IActionResult CancelBooking(int BookingID)
         {
+
             DataTable dt = dal.PR_Booking_SelectByPK(BookingID);
-            BookingModel modelBooking = new BookingModel();
+            CancelModel bookingModel = new CancelModel();
+
             foreach (DataRow dr in dt.Rows)
             {
-                modelBooking.BookingID = Convert.ToInt32(dr["BookingID"]);
-                modelBooking.UserID = Convert.ToInt32(dr["UserID"]);
-                modelBooking.Amount = Convert.ToDecimal(dr["Amount"]);
-                modelBooking.VenueID = Convert.ToInt32(dr["VenueID"]);
-                modelBooking.VenueName = Convert.ToString(dr["VenueName"]);
-                modelBooking.ISBooked = Convert.ToBoolean(dr["ISBooked"]);
-                modelBooking.BookingStartDate = Convert.ToDateTime(dr["BookingStartDate"]);
-                modelBooking.BookingEndDate = Convert.ToDateTime(dr["BookingEndDate"]);
-                modelBooking.NumOfDays = Convert.ToInt32(dr["NumberOfDays"]);
-                modelBooking.AdvancePayment = Convert.ToDecimal(dr["AdvancePayment"]);
-                modelBooking.PaymentAfterEvent = Convert.ToDecimal(dr["PaymentAfterEvent"]);
-                modelBooking.PaymentStatus = Convert.ToString(dr["PaymentStatus"]);
-                modelBooking.UserName = Convert.ToString(dr["UserName"]);
-                modelBooking.ContactNO = Convert.ToString(dr["ContactNO"]);
-                modelBooking.Email = Convert.ToString(dr["Email"]);
+                    
+                bookingModel.BookingID = Convert.ToInt32(dr["BookingID"]);
+                bookingModel.VenueID = Convert.ToInt32(dr["VenueID"]);
+                
+                
+                bookingModel.VenueName = Convert.ToString(dr["VenueName"]);
+                
+                bookingModel.BookingStartDate = Convert.ToDateTime(dr["BookingStartDate"]);
+                bookingModel.BookingEndDate = Convert.ToDateTime(dr["BookingEndDate"]);
+                bookingModel.NumOfDays = Convert.ToInt32(dr["NumberOfDays"]);
+
+               
+                bookingModel.CancellationPolicy = Convert.ToDecimal(dr["CancellationPolicy"]);
+                bookingModel.UserID = Convert.ToInt32(dr["UserID"]);
+                
             }
-            DataTable dt1 = dal.PR_Payment_SelectByPK(PaymentID);
+
+
+
+            return View("CancelBooking",bookingModel);
+
+
+        }
+        [HttpPost]
+        public IActionResult CancellationPolicy(CancelModel bookingModel)
+        {
+            Console.WriteLine(ModelState.IsValid);
+            if(ModelState.IsValid)
+            {
+                dal.InsertCancelBookingRequest(bookingModel);
+                return RedirectToAction("CancelList");
+            }
+            else
+            {
+                return View("CancelBooking");
+            }
+        }
+        public IActionResult CancelList()
+        {
+            int UserID = HttpContext.Session.GetInt32("UserID").Value;
+            DataTable dt = dal.PR_CancelBooking_SelectByUserID(UserID);
+            return View("CancelList", dt);
+
+        }
+        public IActionResult CancelListByVenueID(int VenueID)
+        {
+            
+            DataTable dt = dal.PR_CancelBooking_SelectByVenueID(VenueID);
+            return View("CancelListByVenueID", dt);
+
+        }
+        public async Task<IActionResult> GeneratePdf(int BookingID,int PaymentID,string? flag)
+        {
+            
+            
+
+            DataTable dt = dal.PR_Payment_SelectByPK(PaymentID);
+            BookingModel bookingModel = new BookingModel();
+            foreach (DataRow dr in dt.Rows)
+            {
+                bookingModel.BookingID = Convert.ToInt32(dr["BookingID"]);
+                bookingModel.UserID = Convert.ToInt32(dr["UserID"]);
+                bookingModel.Amount = Convert.ToDecimal(dr["Amount"]);
+                bookingModel.PaymentID = Convert.ToInt32(dr["PaymentID"]);
+                bookingModel.PaymentDate = Convert.ToDateTime(dr["PaymentDate"]);
+
+                bookingModel.BookingStartDate = Convert.ToDateTime(dr["BookingStartDate"]);
+                bookingModel.BookingEndDate = Convert.ToDateTime(dr["BookingEndDate"]);
+                bookingModel.NumOfDays = Convert.ToInt32(dr["NumberOfDays"]);
+
+                bookingModel.AdvancePayment = Convert.ToDecimal(dr["AdvancePayment"]);
+
+                bookingModel.PaymentAfterEvent = Convert.ToDecimal(dr["PaymentAfterEvent"]);
+                bookingModel.PaymentAmount = Convert.ToDecimal(dr["PaymentAmount"]);
+
+                bookingModel.UserName = Convert.ToString(dr["UserName"]);
+                bookingModel.ContactNO = Convert.ToString(dr["ContactNO"]);
+                bookingModel.Email = Convert.ToString(dr["Email"]);
+            }
+            DataTable dt1 = dal.PR_Booking_SelectByPK(BookingID);
             foreach (DataRow dr in dt1.Rows)
             {
-                modelBooking.PaymentID = Convert.ToInt32(dr["PaymentID"]);
-                modelBooking.PaymentAmount = Convert.ToDecimal(dr["Amount"]);
-                modelBooking.PaymentDate = Convert.ToDateTime(dr["PaymentDate"]);
+                bookingModel.VenueName = Convert.ToString(dr["VenueName"]);
+                bookingModel.Receiver = Convert.ToString(dr["UserName"]);
+                bookingModel.ReceiverEmail = Convert.ToString(dr["Email"]);
+                bookingModel.VenueID = Convert.ToInt32(dr["VenueID"]);
             }
+            DataTable dt3 = dal1.PR_VenueDetails_SelectByPK(bookingModel.VenueID);
+            foreach (DataRow dr in dt3.Rows)
+            {
+                
+                bookingModel.VenueOwner = Convert.ToString(dr["VenueOwner"]);
+                bookingModel.VenueOwnerEmail = Convert.ToString(dr["VenueOwnerEmail"]);
+                bookingModel.UserID = Convert.ToInt32(dr["VenueOwnerID"]);
+            }
+
+            var VIEWHTML = "khush";
             // Render the view to HTML asynchronously without passing a model
-            var viewHtml = await this.RenderViewAsync<object>("Pdf", modelBooking);
+            if(flag != null)
+            {
+                var viewHtml = await this.RenderViewAsync<object>("Pdf", bookingModel);
+                VIEWHTML = viewHtml;
+            }
+            else
+            {
+                var viewHtml = await this.RenderViewAsync<object>("Pdf1", bookingModel);
+                VIEWHTML = viewHtml;
+
+
+            }
 
             // Use the HTML content from the view
             var converter = new BasicConverter(new PdfTools());
@@ -471,7 +577,7 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 Objects = {
             new ObjectSettings {
                 PagesCount = true,
-                HtmlContent = viewHtml, // Use the dynamically generated HTML
+                HtmlContent = VIEWHTML, // Use the dynamically generated HTML
                 WebSettings = { DefaultEncoding = "utf-8" },
                 HeaderSettings = { FontName = "Arial", FontSize = 9, Right = "Page [page] of [toPage]", Line = true },
                 FooterSettings = { FontName = "Arial", FontSize = 9, Line = true, Center = "Footer" }
@@ -480,9 +586,113 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             };
 
             var pdfBytes = converter.Convert(doc);
+            string uploadFolder = "wwwroot/assets/upload";
+            string path = Path.Combine(Directory.GetCurrentDirectory(), uploadFolder);
+
+            // Create the folder if it doesn't exist
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            // Generate a unique file name for the PDF
+            string fileName = $"generated_pdf_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            string filePath = Path.Combine(path, fileName);
+
+            // Save the generated PDF to the specified folder
+            System.IO.File.WriteAllBytes(filePath, pdfBytes);
+            var pdfFilePath = "wwwroot/assets/upload/"+fileName;
+            var pdfAttachment = new MimePart("application", "pdf")
+            {
+                Content = new MimeContent(System.IO.File.OpenRead(pdfFilePath), ContentEncoding.Default),
+                ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                ContentTransferEncoding = ContentEncoding.Base64,
+                FileName = Path.GetFileName(pdfFilePath)
+            };
+
+            var builder = new BodyBuilder();
+
+            // Set the plain-text version of the message text
+            if (flag != null)
+            {
+                builder.TextBody = @"Thank you for choosing"+ " " + bookingModel.VenueName + "for your special day! We're excited to be a part of your wedding celebration.";
+            }
+            else
+            {
+                builder.TextBody = @"We hope this email finds you well. We would like to inform you that a refund has been processed for your booking at" + " " + bookingModel.VenueName + ".";
+
+            }
+
+
+            // Attach the PDF file to the email
+            builder.Attachments.Add(pdfAttachment);
+            InternetAddressList list = new InternetAddressList();
+            list.Add(new MailboxAddress(bookingModel.VenueOwner, bookingModel.VenueOwnerEmail));
+            list.Add(new MailboxAddress(bookingModel.Receiver, bookingModel.ReceiverEmail));
+            
+
+            // Construct the message
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+            message.To.AddRange(list);
+            if (flag != null)
+            {
+                message.Subject = "Booking Receipt for your Wedding Venue" + " " + bookingModel.VenueName;
+            }
+            else
+            {
+                message.Subject = "Refund Receipt for your booking at" + " " + bookingModel.VenueName;
+
+            }
+
+
+            message.Body = builder.ToMessageBody();
+
+            // Send the email
+            using (var client = new SmtpClient())
+            {
+                client.Connect("smtp.gmail.com", 587, false);
+                client.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+                client.Send(message);
+                client.Disconnect(true);
+            }
 
             // Provide the generated PDF as a download
-            return File(pdfBytes, "application/pdf", "my_generated_pdf.pdf");
+            return File(pdfBytes, "application/pdf", fileName);
+        }
+        public IActionResult SendEmail()
+        {
+            try
+            {
+                var email = new MimeMessage();
+
+                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+                email.To.Add(new MailboxAddress("Jimmy Pot", "ashwinigohel93@gmail.com"));
+
+                email.Subject = "Testing out email sending";
+                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = "Hello all the way from the land of C#"
+                };
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Connect("smtp.gmail.com", 587, false);
+
+                    // Note: only needed if the SMTP server requires authentication
+                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+
+                    smtp.Send(email);
+                    smtp.Disconnect(true);
+                }
+
+                return RedirectToAction("Index", "Home"); // or any other action you prefer
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
 

@@ -6,6 +6,8 @@ namespace WeddingVeneus1.Areas.Booking.Models
 {
     public class BookingModel
     {
+        public string? VenueOwner { get; set; }
+        public string? VenueOwnerEmail { get; set; }
         public int? BookingID { get; set; }
         public int UserID { get; set; }
         public int? PaymentID { get; set; }
@@ -36,18 +38,40 @@ namespace WeddingVeneus1.Areas.Booking.Models
         public string? Remarks { get; set; }
         public string? PaymentStatus { get; set; }
         public int? flag { get; set; }
+        public int? CancelID { get; set; }
 
         public string?   ContactNO { get; set; }
         public string? Email { get; set; }
         public decimal? PaymentAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
+        public decimal? CancellationPolicy { get; set; }
+        public string? Reason { get;set; }
+        public string? Receiver { get; set; }
+        public string? ReceiverEmail { get; set; }
 
 
     }
-    
-    
-    
-    
+    public class CancelModel
+    {
+        public DateTime? BookingStartDate { get; set; }
+        public DateTime? BookingEndDate { get; set; }
+        public int? NumOfDays { get; set; }
+        public int? UserID { get; set; }
+        public int? BookingID { get; set; }
+        public int? VenueID { get; set; }
+        public string? VenueName { get; set; }
+        public string? Reason { get; set; }
+
+        public decimal? CancellationPolicy { get; set; }
+
+
+
+
+    }
+
+
+
+
 
 
 

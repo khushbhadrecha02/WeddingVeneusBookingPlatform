@@ -1,0 +1,84 @@
+﻿@using System.Data;
+@model DataTable;
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+}
+<div class="pagetitle">
+    <h1>Venue</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Tables</li>
+            <li class="breadcrumb-item active">Data</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section>
+    <div>
+        <div>
+            <div>
+                <div>
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">CancelID</th>
+                                <th scope="col">VenueName</th>
+                                <th scope="col">BookingStartDate</th>
+                                <th scope="col">BookingEndDate</th>
+                                <th scope="col">Number Of Days</th>
+                                <th scope="col">Reason</th>
+                                <th scope="col">Status</th>
+                                
+                                <th scope="col">Actions</th>
+
+
+
+
+                                @*@<th scope="col">Modified</th>*@
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                            @foreach (DataRow dr in Model.Rows)
+                            {
+                                <tr>
+                                    <th scope="row">@dr["CancelID"]</th>
+                                    <td>@dr["VenueName"]</td>
+                                    <td>@Convert.ToDateTime(dr["BookingStartDate"]).ToString("dd-MM-yy")</td>
+                                    <td>@Convert.ToDateTime(dr["BookingEndDate"]).ToString("dd-MM-yy")</td>
+                                    <td>@dr["NumberOfDays"]</td>
+                                    <td>@dr["Reason"]</td>
+                                    <td>@dr["Status"]</td>
+                                    
+
+
+
+
+
+                                    <td>
+                                        <div>
+
+
+                                            <a asp-area="Booking" asp-controller="Booking" asp-action="PaymentPage" asp-route-bookingID="@dr["CancelID"]" class="btn btn-primary">
+                                                <i class="bi bi-wallet"></i>
+                                            </a>
+                                            
+
+
+
+
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

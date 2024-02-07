@@ -157,6 +157,37 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
+        #region InsertaCancelBookingRequest
+        public void InsertCancelBookingRequest(CancelModel bookingModel)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("InsertCancelBookingRequest");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, bookingModel.UserID);
+                db.AddInParameter(dbCMD, "BookingID", SqlDbType.Int, bookingModel.BookingID);
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, bookingModel.VenueID);
+
+                db.AddInParameter(dbCMD, "Reason", SqlDbType.NVarChar, bookingModel.Reason);
+
+
+
+
+                //db.AddOutParameter(dbCMD, "BookingID", SqlDbType.Int, 0);
+
+
+                db.ExecuteNonQuery(dbCMD);
+
+                //bookingModel.BookingID = Convert.ToInt32(db.GetParameterValue(dbCMD, "BookingID"));
+
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine(ex.Message);
+            }
+        }
+        #endregion
         #region PR_Booking_CalculateAdvanceAndPaymentAfterEvent
         public DataTable PR_Booking_CalculateAdvanceAndPaymentAfterEvent(BookingModel bookingModel)
         {
@@ -196,7 +227,7 @@ namespace WeddingVeneus1.DAL
                 SqlDatabase db = new SqlDatabase(ConnString);
                 DbCommand dbCMD = db.GetStoredProcCommand("InsertPayment");
                 db.AddInParameter(dbCMD, "Amount", SqlDbType.Decimal, bookingModel.AdvancePayment);
-                db.AddInParameter(dbCMD, "Name", SqlDbType.NVarChar, bookingModel.UserID);
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.NVarChar, bookingModel.UserID);
                 db.AddInParameter(dbCMD, "Remarks", SqlDbType.NVarChar, bookingModel.Remarks);
                 db.AddInParameter(dbCMD, "BookingID", SqlDbType.Int, bookingModel.BookingID);
 
@@ -333,6 +364,89 @@ namespace WeddingVeneus1.DAL
             {
                 Console.WriteLine(ex.Message);
                 return null;
+            }
+        }
+        #endregion
+        #region PR_CancelBooking_SelectByUserID
+        public DataTable PR_CancelBooking_SelectByUserID(int UserID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_CancelBooking_SelectByUserID");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID);
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        #endregion
+        #region PR_CancelBooking_SelectByVenueID
+        public DataTable PR_CancelBooking_SelectByVenueID (int VenueID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_CancelBooking_SelectByVenueID");
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, VenueID);
+
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+        #endregion
+        #region InsertPaymentRefunded
+        public void InsertPaymentRefunded(BookingModel bookingModel)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("InsertPaymentRefunded");
+                db.AddInParameter(dbCMD, "Amount", SqlDbType.Decimal, bookingModel.AdvancePayment);
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.NVarChar, bookingModel.UserID);
+                db.AddInParameter(dbCMD, "Remarks", SqlDbType.NVarChar, bookingModel.Remarks);
+                db.AddInParameter(dbCMD, "BookingID", SqlDbType.Int, bookingModel.BookingID);
+                db.AddInParameter(dbCMD, "CancelID", SqlDbType.Int, bookingModel.CancelID);
+
+
+
+
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    if (dr.Read())
+                    {
+                        // Read the BookingID from the result set
+                        bookingModel.PaymentID = Convert.ToInt32(dr["PaymentID"]);
+                        bookingModel.PaymentAmount = Convert.ToDecimal(dr["Amount"]);
+                        bookingModel.PaymentDate = Convert.ToDateTime(dr["PaymentDate"]);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+                Console.WriteLine(ex.Message);
             }
         }
         #endregion

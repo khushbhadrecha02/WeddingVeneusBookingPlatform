@@ -1,0 +1,92 @@
+﻿@using System.Data;
+@model DataTable;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="pagetitle">
+    <h1>Venue</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item">Tables</li>
+            <li class="breadcrumb-item active">Data</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+<section>
+    <div>
+        <div>
+            <div>
+                <div style="overflow-x: auto;">
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">CancelID</th>
+                                <th scope="col">UserName</th>
+                                <th scope="col">BookingStartDate</th>
+                                <th scope="col">BookingEndDate</th>
+                                <th scope="col">Number Of Days</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Amount Paid</th>
+                                <th scope="col">Pending Amount</th>
+                                <th scope="col">Reason</th>
+                                <th scope="col">Refund</th>
+                                <th scope="col">Actions</th>
+
+
+
+
+
+                                @*@<th scope="col">Modified</th>*@
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+
+
+                            @foreach (DataRow dr in Model.Rows)
+                            {
+                                <tr>
+                                    <th scope="row">@dr["CancelID"]</th>
+                                    <td>@dr["UserName"]</td>
+                                    <td>@Convert.ToDateTime(dr["BookingStartDate"]).ToString("dd-MM-yy")</td>
+                                    <td>@Convert.ToDateTime(dr["BookingEndDate"]).ToString("dd-MM-yy")</td>
+                                    <td>@dr["NumberOfDays"]</td>
+                                    <td>@dr["Amount"]</td>
+                                    <td>@dr["AdvancePayment"]</td>
+                                    <td>@dr["PaymentAfterEvent"]</td>
+                                    <td>@dr["Reason"]</td>
+                                    <td>@dr["Refund"]</td>
+
+
+
+
+
+                                    <td>
+                                        <div>
+
+
+                                            <a asp-area="Booking" asp-controller="Booking" asp-action="PaymentPage" asp-route-bookingID="@dr["BookingID"]" asp-route-CancelID="@dr["CancelID"]" asp-route-advancePayment="@dr["Refund"]"  class="btn btn-primary">
+                                                <i class="bi bi-wallet"></i>
+                                            </a>
+                                            <a asp-area="Booking" asp-controller="Booking" asp-action="CancelBooking" asp-route-bookingID="@dr["BookingID"]" class="btn btn-secondary">
+                                                <i class="bi bi-x-circle"></i>
+                                            </a>
+
+
+
+
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

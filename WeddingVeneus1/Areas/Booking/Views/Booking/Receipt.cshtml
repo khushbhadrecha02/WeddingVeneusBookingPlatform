@@ -1,5 +1,7 @@
 ﻿@using WeddingVeneus1.Areas.Booking.Models;
-@model BookingModel
+@model BookingModel;
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
 @{
 }
 @{
@@ -29,8 +31,18 @@
                 <div style="display: flex;">
                     <div style="flex: 1;">
                         <div style="color: #6c757d;">
-                            <h5 style="font-size: 16px; margin-bottom: 3px;">Billed To:</h5>
-                            <h5 style="font-size: 15px; margin: 0 0 2px;">@Model.UserName</h5>
+                            @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                            {
+                                <h5 style="font-size: 16px; margin-bottom: 3px;">Booking From:</h5>
+                                <h5 style="font-size: 15px; margin: 0 0 2px;">@Model.UserName</h5>
+                            }
+                            else
+                            {
+                                <h5 style="font-size: 16px; margin-bottom: 3px;">Refund From:</h5>
+                                <h5 style="font-size: 15px; margin: 0 0 2px;">@Model.VenueName</h5>
+                            }
+                            
+                            
                             @* <p style="margin: 0 0 1px;">4068 Post Avenue Newfolden, MN 56738</p> *@
                             <p style="margin: 0 0 1px;">@Model.Email</p>
                             <p>@Model.ContactNO</p>
@@ -62,7 +74,17 @@
                             <thead>
                                 <tr>
                                     <th style="width: 70px;">No.</th>
-                                    <th>VenueName</th>
+                                    @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                                    {
+                                        <th>VenueName</th>
+
+                                    }
+                                    else
+                                    {
+                                        <th>Refund to</th>
+
+                                    }
+
                                     <th>BookingStartDate</th>
                                     <th>BookingEndDate</th>
                                     <th style="text-align: right; width: 120px;">NumberOfDays</th>
@@ -72,10 +94,22 @@
                                 <tr>
                                     <th scope="row">01</th>
                                     <td>
-                                        <div>
-                                            <h5 style="font-size: 14px; margin-bottom: 1px;">@Model.VenueName</h5>
-                                            
-                                        </div>
+                                        @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                                        {
+                                            <div>
+                                                <h5 style="font-size: 14px; margin-bottom: 1px;">@Model.VenueName</h5>
+
+                                            </div>
+
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <h5 style="font-size: 14px; margin-bottom: 1px;">@Model.Receiver</h5>
+
+                                            </div>
+                                        }
+
                                     </td>
                                     <td>@Model.BookingStartDate</td>
                                     <td>@Model.BookingEndDate</td>
@@ -94,6 +128,14 @@
                                     <th scope="row" colspan="4" style="text-align: right; border: 0;">Pending Amount :</th>
                                     <td style="text-align: right; border: 0;"><i class="bi bi-currency-rupee"></i>@Model.PaymentAfterEvent</td>
                                 </tr>
+                                @if (accessor.HttpContext.Session.GetString("Role") != "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                                {
+                                    <tr>
+                                        <th scope="row" colspan="4" style="text-align: right; border: 0;">Calculated Refund :</th>
+                                        <td style="text-align: right; border: 0;"><i class="bi bi-currency-rupee"></i>@Model.PaymentAmount</td>
+                                    </tr>
+                                }
+                                
                                 
                                 <tr>
                                     
@@ -106,7 +148,16 @@
                     <div style="margin-top: 4px;">
                         <div class="d-print-none">
                             <div style="text-align: right;">
+                                @if (accessor.HttpContext.Session.GetString("Role") == "User" || accessor.HttpContext.Session.GetString("Role") == null)
+                                {
+                                    <a asp-area="Booking" asp-controller="Booking" asp-action="GeneratePdf" asp-route-BookingID="@Model.BookingID" asp-route-PaymentID="@Model.PaymentID" asp-route-flag = "khush" style="background-color: #28a745; color: #fff; margin-right: 1px; padding: 6px 12px; text-decoration: none; font-size: 12px;"><i class="fa fa-print"></i></a>
+
+                                }
+                                else
+                                {
                                 <a asp-area="Booking" asp-controller="Booking" asp-action="GeneratePdf" asp-route-BookingID="@Model.BookingID" asp-route-PaymentID="@Model.PaymentID" style="background-color: #28a745; color: #fff; margin-right: 1px; padding: 6px 12px; text-decoration: none; font-size: 12px;"><i class="fa fa-print"></i></a>
+
+                                }
                                 <a  href="#" style="background-color: #007bff; color: #fff; padding: 6px 12px; text-decoration: none; font-size: 14px;">Send</a>
                             </div>
                         </div>
