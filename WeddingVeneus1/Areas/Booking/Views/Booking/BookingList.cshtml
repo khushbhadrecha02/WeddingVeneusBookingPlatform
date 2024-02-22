@@ -1,7 +1,17 @@
 ﻿@using System.Data;
-@model DataTable;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
+
+@using WeddingVeneus1.Areas.Booking.Models;
+@model Booking_ViewModel1;
 @{
-    Layout = "~/Views/Shared/_Layout1.cshtml";
+    if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout1.cshtml";
+    }
 }
 <div class="pagetitle">
     <h1>Venue</h1>
@@ -13,6 +23,45 @@
         </ol>
     </nav>
 </div><!-- End Page Title -->
+<div class="card">
+    <div class="card-title">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-12">
+                    <form asp-area="Booking" asp-controller="Booking" asp-action="Search" method="post">
+                        <div class="row align-items-center justify-content-center">
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                <select class="form-select StateID" asp-for="@Model.booking_SearchModel.VenueID" asp-items="@(new SelectList(ViewBag.VenueList,"VenueID","VenueName"))" >
+                                    <option value="">Select Venue</option>
+                                </select>
+                            </div>
+                            
+                            
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                <input type="date" asp-for="@Model.booking_SearchModel.BookingStartDate" class="form-control" placeholder="BookingStartDate" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                <input type="date" asp-for="@Model.booking_SearchModel.BookingEndDate" class="form-control" placeholder="BookingEndDate" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                <input type="text" asp-for="@Model.booking_SearchModel.AmountPaid" class="form-control" placeholder="AmountPaid" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                <input type="text" asp-for="@Model.booking_SearchModel.PendingAmount" class="form-control" placeholder="PendingAmount" />
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+
+                                <button type="submit" value="search" name="submit" class="btn btn-primary">Submit</button>
+                                <button type="submit" value="list" name="submit" class="btn btn-secondary">Reset</button>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <section>
 <div>
 <div>
@@ -28,8 +77,10 @@
             <th scope="col">Number Of Days</th>
             <th scope="col">Amount Paid</th>
             <th scope="col">Pending Amount</th>
-            <th scope="col">Actions</th>
-
+            @if (accessor.HttpContext.Session.GetString("Role") == "User")
+            {
+                                    <th scope="col">Actions</th>
+            }
 
 
             
@@ -41,7 +92,7 @@
     <tbody>
 
 
-        @foreach (DataRow dr in Model.Rows)
+        @foreach (DataRow dr in Model.bookingList.Rows)
         {
             <tr>
                 <th scope="row">@dr["BookingID"]</th>
@@ -54,8 +105,9 @@
 
 
 
-                
 
+                @if (accessor.HttpContext.Session.GetString("Role") == "User")
+                {
                 <td>
                     <div>
 
@@ -72,6 +124,7 @@
 
                     </div>
                 </td>
+                }
             </tr>
 
         }

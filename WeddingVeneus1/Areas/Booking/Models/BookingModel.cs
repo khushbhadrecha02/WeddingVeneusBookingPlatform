@@ -51,6 +51,21 @@ namespace WeddingVeneus1.Areas.Booking.Models
 
 
     }
+    public class Booking_SearchModel
+    {
+        public int? UserID  { get; set; }
+        public int? VenueID { get; set; }
+        public DateTime? BookingStartDate  { get; set; }
+        public DateTime? BookingEndDate { get; set; }
+        public decimal? PendingAmount { get; set; }
+        public decimal? AmountPaid { get; set; }
+        public string? SubmitType { get; set; }
+    }
+    public class Booking_ViewModel1
+    {
+        public Booking_SearchModel booking_SearchModel { get; set; }
+        public DataTable bookingList { get; set; }
+    }
     public class CancelModel
     {
         public DateTime? BookingStartDate { get; set; }

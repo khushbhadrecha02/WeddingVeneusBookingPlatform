@@ -2,6 +2,7 @@
 using System.Data.Common;
 using System.Data;
 using WeddingVeneus1.Areas.Login.Models;
+using WeddingVeneus1.Areas.Category.Models;
 
 namespace WeddingVeneus1.DAL
 {
@@ -16,6 +17,29 @@ namespace WeddingVeneus1.DAL
                 DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_SelectByEmailAndPassword");
                 db.AddInParameter(dbCMD, "Email", SqlDbType.VarChar, loginModel.Email);
                 db.AddInParameter(dbCMD, "Password", SqlDbType.VarChar, loginModel.Password);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+        #region PR_Login_CheckUniqueConstraint
+        public DataTable PR_Login_CheckUniqueConstraint(string Email)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_Login_CheckUniqueConstraint");
+                db.AddInParameter(dbCMD, "Email", SqlDbType.VarChar,Email);
+                
                 DataTable dt = new DataTable();
                 dt.Columns.Add();
                 using (IDataReader dr = db.ExecuteReader(dbCMD))
@@ -54,7 +78,7 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
-        #region PR_Branch_Insert
+        #region PR_MST_User_Insert
         public void PR_MST_User_Insert(LoginModel loginModel)
         {
             try
@@ -67,6 +91,68 @@ namespace WeddingVeneus1.DAL
                 db.AddInParameter(dbCMD, "Photopath", SqlDbType.VarChar, loginModel.PhotoPath);
                 db.AddInParameter(dbCMD, "Password", SqlDbType.VarChar, loginModel.Password);
                 db.AddInParameter(dbCMD, "ContactNO", SqlDbType.VarChar, loginModel.ContactNO);
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        #endregion
+        #region PR_MST_User_AdminInsert
+        public void PR_MST_User_AdminInsert(LoginModel loginModel)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_AdminInsert");
+                db.AddInParameter(dbCMD, "UserName", SqlDbType.VarChar, loginModel.UserName);
+                db.AddInParameter(dbCMD, "Email", SqlDbType.VarChar, loginModel.Email);
+                db.AddInParameter(dbCMD, "RoleID", SqlDbType.Int, loginModel.RoleID);
+                db.AddInParameter(dbCMD, "Photopath", SqlDbType.VarChar, loginModel.PhotoPath);
+                db.AddInParameter(dbCMD, "Password", SqlDbType.VarChar, loginModel.Password);
+                db.AddInParameter(dbCMD, "ContactNO", SqlDbType.VarChar, loginModel.ContactNO);
+                db.ExecuteNonQuery(dbCMD);
+
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        #endregion
+        #region PR_MST_User_SelectAdminRequestList
+        public DataTable PR_MST_User_SelectAdminRequestList()
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_SelectAdminRequestList");
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+        #region PR_MST_User_ApproveAdminAccess
+        public void PR_MST_User_ApproveAdminAccess(int UserID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_ApproveAdminAccess");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID);
                 db.ExecuteNonQuery(dbCMD);
 
             }

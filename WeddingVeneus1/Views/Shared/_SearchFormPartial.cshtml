@@ -1,45 +1,104 @@
 ﻿<!-- _SearchFormPartial.cshtml -->
 @using WeddingVeneus1.Areas.VenueDetails.Models;
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
 @model VenueDetails_ViewModel;
 
 
-<div class="card" style="display:none" id="toggleElement">
-    <div class="card-title">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-12">
-                    <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
-                        <div class="row align-items-center justify-content-center">
-                            <div class="col-lg-2 col-md-2 col-sm-12 mb-2 ">
-                                <select class="form-select StateID"  asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
-                                    <option value="">Select State</option>
-                                </select>
+@if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+{
+    <div class="card">
+        <div class="card-title">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <select class="form-select StateID" asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-1  col-sm-12 mb-2 ">
+                                    <select class="form-select CityID" asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <select class="form-select" asp-for="@Model.venue_Search_Model.CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                                @* <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.RentPerDay" class="form-control" placeholder="Rent Per Day" />
+                                </div> *@
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.GuestCapacity" class="form-control" placeholder="Guest Capacity" />
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.VenueName" class="form-control" placeholder="Guest Capacity" />
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+
+                                    <button type="submit" value="search" name="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" value="list" name="submit" class="btn btn-secondary">Reset</button>
+
+                                </div>
                             </div>
-                            <div class="col-lg-2 col-md-2  col-sm-12 mb-2 ">
-                                <select class="form-select CityID"  asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
-                                    <option value="">Select City</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-12 mb-2 ">
-                                <select class="form-select" asp-for="@Model.venue_Search_Model.CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
-                                    <option value="">Select Category</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-12 mb-2 ">
-                                <input type="text" asp-for="@Model.venue_Search_Model.RentPerDay" class="form-control" placeholder="Rent Per Day" />
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-12 mb-2">
-                                <input type="text" asp-for="@Model.venue_Search_Model.GuestCapacity" class="form-control" placeholder="Guest Capacity" />
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-12 mb-2">
-                                <button type="submit" class="btn btn-danger">Find Venues</button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    <div class="card" style="display:none" id="toggleElement">
+        <div class="card-title">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <select class="form-select StateID" asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
+                                        <option value="">Select State</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-1  col-sm-12 mb-2 ">
+                                    <select class="form-select CityID" asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
+                                        <option value="">Select City</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <select class="form-select" asp-for="@Model.venue_Search_Model.CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
+                                        <option value="">Select Category</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.RentPerDay" class="form-control" placeholder="Rent Per Day" />
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.GuestCapacity" class="form-control" placeholder="Guest Capacity" />
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+                                    <input type="text" asp-for="@Model.venue_Search_Model.VenueName" class="form-control" placeholder="Guest Capacity" />
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-12 mb-2">
+
+                                    <button type="submit" value="search" name="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" value="list" name="submit" class="btn btn-secondary">Reset</button>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 
 

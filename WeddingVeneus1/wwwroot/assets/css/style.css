@@ -23,10 +23,15 @@ a {
   color: #4154f1;
   text-decoration: none;
 }
+custom-card-anchor {
+    text-decoration: none; /* Removes underline from links */
+    color: inherit; /* The link will inherit the text color from its parent */
+    display: block;
+}
 
 a:hover {
-  color: #717ff5;
-  text-decoration: none;
+    color: #717ff5;
+    text-decoration: none;
 }
 
 h1,
@@ -96,7 +101,21 @@ h6 {
   color: #fff;
   line-height: 0;
 }
+.notification {
+    position: relative;
+    display: inline-block; /* or inline-flex depending on your layout needs */
+}
 
+.badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    padding: 5px 10px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+    font-size: 12px; /* Adjust size as needed */
+}
 .back-to-top:hover {
   background: #6776f4;
   color: #fff;

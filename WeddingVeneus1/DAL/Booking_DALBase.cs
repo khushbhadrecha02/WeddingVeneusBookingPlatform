@@ -2,6 +2,7 @@
 using System.Data.Common;
 using System.Data;
 using WeddingVeneus1.Areas.Booking.Models;
+using WeddingVeneus1.Areas.VenueDetails.Models;
 
 namespace WeddingVeneus1.DAL
 {
@@ -343,14 +344,46 @@ namespace WeddingVeneus1.DAL
                 Console.WriteLine(ex.Message);
             }
         }
-        #region PR_Booking_SelectByUserID
-        public DataTable PR_Booking_SelectByUserID(int UserID)
+        #region PR_Booking_SelectByPage
+        public DataTable PR_Booking_SelectByPage(Booking_SearchModel booking_SearchModel,int? UserID,int? VenueID)
         {
             try
             {
+                
                 SqlDatabase db = new SqlDatabase(ConnString);
-                DbCommand dbCMD = db.GetStoredProcCommand("PR_Booking_SelectByUserID");
-                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_Booking_SelectByPage");
+                if (booking_SearchModel == null)
+                {
+                    db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, DBNull.Value);
+                    db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, VenueID.HasValue ? (object)VenueID.Value : DBNull.Value);
+                    db.AddInParameter(dbCMD, "BookingStartDate", SqlDbType.Decimal, DBNull.Value);
+                    db.AddInParameter(dbCMD, "BookingEndDate", SqlDbType.Decimal, DBNull.Value);
+                    db.AddInParameter(dbCMD, "PendingAmount", SqlDbType.Decimal, DBNull.Value);
+                    db.AddInParameter(dbCMD, "AmountPaid", SqlDbType.Decimal, DBNull.Value);
+                    
+                }
+                else
+                {
+                    if (booking_SearchModel.SubmitType == "list")
+                    {
+                        db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, DBNull.Value);
+                        db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, DBNull.Value);
+                        db.AddInParameter(dbCMD, "BookingStartDate", SqlDbType.DateTime, DBNull.Value);
+                        db.AddInParameter(dbCMD, "BookingEndDate", SqlDbType.DateTime, DBNull.Value);
+                        db.AddInParameter(dbCMD, "PendingAmount", SqlDbType.Decimal, DBNull.Value);
+                        db.AddInParameter(dbCMD, "AmountPaid", SqlDbType.Decimal, DBNull.Value);
+                    }
+                    else
+                    {
+                        db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID.HasValue ? (object)UserID.Value : DBNull.Value);
+                        db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, booking_SearchModel.VenueID);
+                        db.AddInParameter(dbCMD, "BookingStartDate", SqlDbType.DateTime, booking_SearchModel.BookingStartDate);
+                        db.AddInParameter(dbCMD, "BookingEndDate", SqlDbType.DateTime, booking_SearchModel.BookingEndDate);
+                        db.AddInParameter(dbCMD, "PendingAmount", SqlDbType.Decimal, booking_SearchModel.PendingAmount);
+                        db.AddInParameter(dbCMD, "AmountPaid", SqlDbType.Decimal, booking_SearchModel.AmountPaid);
+                    }
+
+                }
 
                 DataTable dt = new DataTable();
                 dt.Columns.Add();

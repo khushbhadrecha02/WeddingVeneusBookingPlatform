@@ -1,27 +1,21 @@
-﻿using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Data;
-using System.Reflection;
-using System.Security.Cryptography.Xml;
 using WeddingVeneus1.Areas.Booking.Models;
-
-using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.VenueDetails.Models;
 using WeddingVeneus1.DAL;
-
 using DinkToPdf;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Humanizer.Localisation.TimeToClockNotation;
 using MimeKit;
 using MailKit.Net.Smtp;
+
 
 namespace WeddingVeneus1.Areas.Booking.Controllers
 {
     [Area("Booking")]
     [Route("Booking/{Controller}/{Action}")]
+    #region BookingController
     public class BookingController : Microsoft.AspNetCore.Mvc.Controller
     {
         #region GloblaStateDalObject
@@ -30,8 +24,8 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
 
 
         #endregion
-        
-        
+
+        #region CheckBookingView
         public IActionResult CheckBooking(int? venueID,string? venueName)
 
         {
@@ -54,6 +48,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             Console.WriteLine("Bookingdate" + booking_ViewModel1.bookingModel.BookingStartDate);
             return View("CheckBooking",booking_ViewModel1);
         }
+        #endregion
+
+        #region CheckBookingStatus
         [HttpPost]
         public IActionResult CheckBookingStatus(Booking_ViewModel booking_ViewModel,string submit)
         {
@@ -174,9 +171,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 
             }
         }
+        #endregion
 
-
-
+        #region CalculateAmount
         public IActionResult CalculateAmount(int NumberOfDays,decimal RentPerDay)
         {
             try
@@ -216,6 +213,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return Json(new { success = false, });
             }
         }
+        #endregion
+
+        #region CalculateAdvancePaymentPercentage
         public IActionResult CalculateAdvancePaymentPer(decimal AdvancePayment, decimal Amount)
         {
             try
@@ -260,6 +260,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return Json(new { success = false, });
             }
         }
+        #endregion
+
+        #region CalculateAdvancePayment
         public IActionResult CalculateAdvancePayment(decimal AdvancePaymentPer, decimal Amount)
         {
             try
@@ -304,6 +307,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return Json(new { success = false, });
             }
         }
+        #endregion
+
+        #region Create
         [Microsoft.AspNetCore.Mvc.HttpPost]
         public IActionResult Create(BookingModel bookingModel) 
         {
@@ -342,6 +348,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             }
 
         }
+        #endregion
+
+        #region PaymentPage
         public IActionResult PaymentPage(int bookingID,decimal? advancePayment,int? CancelID)
         {
             Console.WriteLine(CancelID);
@@ -379,6 +388,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             }
             return View("PaymentPage", modelBooking);
         }
+        #endregion
+
+        #region PaymentPagePostMethod
         [HttpPost]
         public IActionResult PaymentPage(BookingModel bookingModel)
         {
@@ -435,17 +447,75 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return RedirectToAction("PaymentPage");
             }
         }
-        public IActionResult BookingList()
+        #endregion
+
+        //public IActionResult Search()
+        //{
+        //    int UserID = HttpContext.Session.GetInt32("UserID").Value;
+
+        //    DataTable dt =dal.PR_Booking_SelectByUserID(UserID);
+
+
+        //    return View("BookingList",dt);
+
+
+        //}
+
+        #region ComboBox
+        public void PopulateDropdownLists()
         {
-            int UserID = HttpContext.Session.GetInt32("UserID").Value;
+            DataTable dt = dal1.PR_MST_Venue_SelectByComboBox();
+            List<VenueDropdownModel> list = new List<VenueDropdownModel>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                VenueDropdownModel vlst = new VenueDropdownModel();
+                vlst.VenueID = Convert.ToInt32(dr["VenueID"]);
+                vlst.VenueName = Convert.ToString(dr["VenueName"]);
+                list.Add(vlst);
 
-            DataTable dt =dal.PR_Booking_SelectByUserID(UserID);
-            
-
-            return View("BookingList",dt);
-            
-            
+            }
+            ViewBag.VenueList = list;
         }
+            #endregion
+
+        #region Search
+            public IActionResult Search(Booking_ViewModel1 booking_ViewModel, string? submit,int? VenueID)
+        {
+            
+            int? UserID = null;
+            int? VenueID1 = null;
+            if(VenueID != null)
+            {
+                VenueID1 = VenueID;
+            }
+
+            if (HttpContext.Session.GetString("Role") == "User")
+
+            {
+
+                int UserID1 = HttpContext.Session.GetInt32("UserID").Value;
+                UserID = UserID1;
+
+                Console.WriteLine(UserID);
+            }
+            if (submit != null)
+            {
+                booking_ViewModel.booking_SearchModel.SubmitType = submit;
+            }
+            DataTable dt = dal.PR_Booking_SelectByPage(booking_ViewModel.booking_SearchModel, UserID,VenueID1);
+            var viewModel = new Booking_ViewModel1()
+            {
+
+                bookingList = dt,
+                booking_SearchModel = new Booking_SearchModel(),
+            };
+            PopulateDropdownLists();            
+
+            return View("BookingList", viewModel);
+        }
+        #endregion
+
+        #region CancelBooking
         public IActionResult CancelBooking(int BookingID)
         {
 
@@ -477,6 +547,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
 
 
         }
+        #endregion
+
+        #region CancellationPolicy
         [HttpPost]
         public IActionResult CancellationPolicy(CancelModel bookingModel)
         {
@@ -491,6 +564,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
                 return View("CancelBooking");
             }
         }
+        #endregion
+
+        #region CancelList
         public IActionResult CancelList()
         {
             int UserID = HttpContext.Session.GetInt32("UserID").Value;
@@ -498,6 +574,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             return View("CancelList", dt);
 
         }
+        #endregion
+
+        #region CancelListByVenueID
         public IActionResult CancelListByVenueID(int VenueID)
         {
             
@@ -505,6 +584,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             return View("CancelListByVenueID", dt);
 
         }
+        #endregion
+
+        #region GeneratePdf
         public async Task<IActionResult> GeneratePdf(int BookingID,int PaymentID,string? flag)
         {
             
@@ -660,40 +742,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             // Provide the generated PDF as a download
             return File(pdfBytes, "application/pdf", fileName);
         }
-        public IActionResult SendEmail()
-        {
-            try
-            {
-                var email = new MimeMessage();
+        #endregion
 
-                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
-                email.To.Add(new MailboxAddress("Jimmy Pot", "ashwinigohel93@gmail.com"));
-
-                email.Subject = "Testing out email sending";
-                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
-                {
-                    Text = "Hello all the way from the land of C#"
-                };
-
-                using (var smtp = new SmtpClient())
-                {
-                    smtp.Connect("smtp.gmail.com", 587, false);
-
-                    // Note: only needed if the SMTP server requires authentication
-                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
-
-                    smtp.Send(email);
-                    smtp.Disconnect(true);
-                }
-
-                return RedirectToAction("Index", "Home"); // or any other action you prefer
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
+        
 
 
 
@@ -703,6 +754,9 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
 
 
     }
+    #endregion
+
+    #region ControllerExtensions
     public static class ControllerExtensions
     {
         public static async Task<string> RenderViewAsync<TModel>(this Controller controller, string viewName, TModel model, bool partial = false)
@@ -739,6 +793,7 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
             }
         }
     }
+    #endregion
 
 }
 

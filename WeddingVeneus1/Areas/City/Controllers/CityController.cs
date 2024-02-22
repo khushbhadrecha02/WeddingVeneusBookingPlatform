@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System.Data;
+using WeddingVeneus1.Areas.Category.Models;
 using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.Photos.Models;
 using WeddingVeneus1.Areas.State.Models;
@@ -21,6 +24,53 @@ namespace WeddingVeneus1.Areas.City.Controllers
 
             DataTable dt = dal.PR_City_SelectAll();
             return View("Index", dt);
+        }
+        #endregion
+        #region PopulateDropdownlist
+        public void PopulateDropdownLists()
+        {
+            DataTable dt = dal.PR_State_SelectByComboBox();
+            List<State_DropDown_Model> list = new List<State_DropDown_Model>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                State_DropDown_Model vlst = new State_DropDown_Model();
+                vlst.StateID = Convert.ToInt32(dr["StateID"]);
+                vlst.StateName = Convert.ToString(dr["StateName"]);
+                list.Add(vlst);
+
+            }
+            ViewBag.StateList = list;
+        }
+        #endregion
+        #region UpdateCityStatus
+        public IActionResult ApproveCityStatus(int CityID)
+        {
+
+            dal.PR_MST_City_ApproveCityStatus(CityID);
+            //TempData["Success"] = ("State Deleted Successfully");
+            return RedirectToAction("_Search");
+        }
+        #endregion
+        #region Search
+        public IActionResult _Search(MST_City_ViewModel mST_City_ViewModel, string? submit,bool? ISConfirmed)
+        {
+            if (ISConfirmed == null)
+            {
+                ISConfirmed = true;
+            }
+            ViewBag.ISConfirmed = ISConfirmed;
+            PopulateDropdownLists();
+            if (submit != null)
+            {
+                mST_City_ViewModel.SearchModel.SubmitType = submit;
+            }
+            DataTable dt = dal.PR_MST_City_SelectByPage(mST_City_ViewModel.SearchModel,ISConfirmed);
+            mST_City_ViewModel.CityDataTable = dt;
+            return View("Index", mST_City_ViewModel);
+
+
+
+
         }
         #endregion
         #region Delete
@@ -75,6 +125,7 @@ namespace WeddingVeneus1.Areas.City.Controllers
             #endregion
         }
         #endregion
+        
         #region Save
         [HttpPost]
         public IActionResult Save(CityModel cityModel)
@@ -100,7 +151,18 @@ namespace WeddingVeneus1.Areas.City.Controllers
                 }
                 if (cityModel.CityID == null)
                 {
+                cityModel.UserID = HttpContext.Session.GetInt32("UserID").Value;
+                if (HttpContext.Session.GetString("Role") == "VenueOwner")
+                {
                     dal.PR_City_Insert(cityModel);
+                    SendEmail(cityModel);
+
+                }
+                else
+                {
+                    dal.PR_MST_City_InsertForAdmin(cityModel);
+                }
+                    
 
                 }
                 else
@@ -123,10 +185,45 @@ namespace WeddingVeneus1.Areas.City.Controllers
 
 
 
-                return RedirectToAction("Index");
+                return RedirectToAction("_Search");
             }
-            
-        
+
+
         #endregion
+        public void SendEmail(CityModel cityModel)
+        {
+            Console.WriteLine(cityModel.Email);
+            try
+            {
+                var email = new MimeMessage();
+
+                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+
+                email.Subject = "Request for adding new state";
+                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = "The venueowner registered with the following mailID " + cityModel.Email + " has requested to add the following state " + cityModel.CityName + "."
+                };
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Connect("smtp.gmail.com", 587, false);
+
+                    // Note: only needed if the SMTP server requires authentication
+                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+
+                    smtp.Send(email);
+                    smtp.Disconnect(true);
+                }
+
+                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //return null;
+            }
+        }
     }
 }

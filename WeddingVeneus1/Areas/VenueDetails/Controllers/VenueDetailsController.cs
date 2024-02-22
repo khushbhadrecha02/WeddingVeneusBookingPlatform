@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System.Data;
 using WeddingVeneus1.Areas.Category.Models;
 using WeddingVeneus1.Areas.City.Models;
@@ -20,16 +22,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
         Category_DALBase dal4 = new Category_DALBase();
 
         #endregion
-        #region Index
-        public IActionResult Index()
-        {
 
-            int userid = HttpContext.Session.GetInt32("UserID").Value;
-            DataTable dt = dal.PR_MST_VenueDetails_SelectByUserID(userid);
-               
-                return View("Index", dt);
-        }
-        #endregion
         #region Create
         public IActionResult Create(int? VenueID)
         {
@@ -80,6 +73,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             #endregion
         }
         #endregion
+
         #region ComboBox
         public void PopulateDropdownLists()
         {
@@ -109,7 +103,8 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             ViewBag.CategoryList = list2;
         }
     #endregion
-    #region delete
+
+        #region delete
     public IActionResult delete(int VenueID)
         {
 
@@ -118,6 +113,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+
         #region DropdownByState
         [HttpPost]
         public IActionResult DropdownByState(int StateID)
@@ -151,8 +147,16 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
 
             if (venueDetailsModel.VenueID == null)
             {
-
-                dal.PR_VenueDetails_Insert(venueDetailsModel);
+                if (HttpContext.Session.GetString("Role") == "VenueOwner")
+                {
+                    dal.PR_VenueDetails_Insert(venueDetailsModel);
+                    SendEmail(venueDetailsModel);
+                }
+                else
+                {
+                    dal.PR_MST_VenueDetails_InsertForAdmin(venueDetailsModel);
+                }
+                    
 
 
             }
@@ -178,6 +182,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             return RedirectToAction("Index", new { Userid = userid });
         }
         #endregion
+
         #region VenueDetail
         public IActionResult VenueDetail(int venueID,int CityID)
         {
@@ -196,6 +201,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
 
         }
         #endregion
+
         #region VenueDetail
         public IActionResult VenueSearch()
         {
@@ -216,15 +222,41 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
 
         }
         #endregion
-        #region Search
-        public IActionResult Search(VenueDetails_ViewModel venueDetails_View)
+
+        #region UpdateVenueStatus
+        public IActionResult ApproveVenueStatus(int VenueID)
         {
-            Console.WriteLine(venueDetails_View.venue_Search_Model.CategoryID);
-            Console.WriteLine(venueDetails_View.venue_Search_Model.StateID);
-            Console.WriteLine(venueDetails_View.venue_Search_Model.CityID);
-            Console.WriteLine(venueDetails_View.venue_Search_Model.GuestCapacity);
-            Console.WriteLine(venueDetails_View.venue_Search_Model.RentPerDay);
-            DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venueDetails_View.venue_Search_Model);
+
+            dal.PR_MST_VenueDetails_ApproveVenueDetails(VenueID);
+            //TempData["Success"] = ("State Deleted Successfully");
+            return RedirectToAction("Search");
+        }
+        #endregion
+
+        #region Search
+        public IActionResult Search(VenueDetails_ViewModel venueDetails_View,string? submit, bool? ISConfirmed)
+        {
+            if (ISConfirmed == null)
+            {
+                ISConfirmed = true;
+            }
+            ViewBag.ISConfirmed = ISConfirmed;
+            int? UserID = null;
+
+            if (HttpContext.Session.GetString("Role") == "VenueOwner")
+
+            {
+
+                int UserID1 = HttpContext.Session.GetInt32("UserID").Value;
+                UserID = UserID1;
+
+                Console.WriteLine(UserID);
+            }
+            if (submit != null)
+            {
+                venueDetails_View.venue_Search_Model.SubmitType = submit;
+            }
+            DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venueDetails_View.venue_Search_Model,UserID,ISConfirmed);
             var viewModel = new VenueDetails_ViewModel()
             {
 
@@ -233,7 +265,45 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             };
             PopulateDropdownLists();
 
-            return View("SearchResult",viewModel );
+            return View("Index",viewModel);
+        }
+        #endregion
+
+        #region SendEmail
+        public void SendEmail(VenueDetailsModel venueDetailsModel)
+        {
+            Console.WriteLine(venueDetailsModel.Email);
+            try
+            {
+                var email = new MimeMessage();
+
+                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+
+                email.Subject = "Request for adding new venue";
+                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = "The venueowner registered with the following mailID " + venueDetailsModel.Email + " has requested to add the following venue " + venueDetailsModel.VenueName + "."
+                };
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Connect("smtp.gmail.com", 587, false);
+
+                    // Note: only needed if the SMTP server requires authentication
+                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+
+                    smtp.Send(email);
+                    smtp.Disconnect(true);
+                }
+
+                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //return null;
+            }
         }
         #endregion
 

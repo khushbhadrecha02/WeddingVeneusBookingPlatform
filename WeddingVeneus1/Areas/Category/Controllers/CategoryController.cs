@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System.Data;
 using WeddingVeneus1.Areas.Category.Models;
 using WeddingVeneus1.Areas.City.Models;
@@ -21,6 +23,27 @@ namespace WeddingVeneus1.Areas.Category.Controllers
 
             DataTable dt = dal.PR_Category_SelectAll();
             return View("Index", dt);
+        }
+        #endregion
+        #region Search
+        public IActionResult _Search(MST_Category_ViewModel mST_Category_ViewModel, string? submit,bool? ISConfirmed)
+        {
+            if (ISConfirmed == null)
+            {
+                ISConfirmed = true;
+            }
+            ViewBag.ISConfirmed = ISConfirmed;
+            if (submit != null)
+            {
+                mST_Category_ViewModel.SearchModel.SubmitType = submit;
+            }
+            DataTable dt = dal.PR_MST_State_SelectByPage(mST_Category_ViewModel.SearchModel,ISConfirmed);
+            mST_Category_ViewModel.CategoryDataTable = dt;
+            return View("Index", mST_Category_ViewModel);
+
+
+
+
         }
         #endregion
         #region Create
@@ -62,6 +85,15 @@ namespace WeddingVeneus1.Areas.Category.Controllers
             return RedirectToAction("Index");
         }
         #endregion
+        #region UpdateStateStatus
+        public IActionResult ApproveCategoryStatus(int CategoryID)
+        {
+
+            dal.PR_MST_Category_ApproveCategoryStatus(CategoryID);
+            //TempData["Success"] = ("State Deleted Successfully");
+            return RedirectToAction("_Search");
+        }
+        #endregion
         #region Save
 
         public IActionResult Save(CategoryModel categoryModel)
@@ -86,7 +118,18 @@ namespace WeddingVeneus1.Areas.Category.Controllers
             
                 if (categoryModel.CategoryID == null)
                 {
-                    dal.PR_Category_Insert(categoryModel);
+                    categoryModel.UserID = HttpContext.Session.GetInt32("UserID").Value;
+                    if (HttpContext.Session.GetString("Role") == "VenueOwner")
+                    {
+                        dal.PR_Category_Insert(categoryModel);
+                        SendEmail(categoryModel);
+
+                    }
+                    else
+                    {
+                        dal.PR_MST_VenueCategory_InsertForAdmin(categoryModel);
+                    }
+                    
 
                 }
                 else
@@ -108,12 +151,50 @@ namespace WeddingVeneus1.Areas.Category.Controllers
 
 
 
-                return RedirectToAction("Index");
+                return RedirectToAction("_Search");
             }
-            
+        #endregion
+        #region SendEmail
+        public void SendEmail(CategoryModel categoryModel)
+        {
+            Console.WriteLine(categoryModel.Email);
+            try
+            {
+                var email = new MimeMessage();
+
+                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+
+                email.Subject = "Request for adding new category";
+                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = "The venueowner registered with the following mailID " + categoryModel.Email + " has requested to add the following category " + categoryModel.CategoryName + "."
+                };
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Connect("smtp.gmail.com", 587, false);
+
+                    // Note: only needed if the SMTP server requires authentication
+                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+
+                    smtp.Send(email);
+                    smtp.Disconnect(true);
+                }
+
+                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //return null;
+            }
         }
-            #endregion
-     }
+        #endregion
+    }
+
+
+}
         
  
 

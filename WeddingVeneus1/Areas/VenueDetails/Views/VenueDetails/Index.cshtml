@@ -1,99 +1,225 @@
-﻿@using System.Data
-@model DataTable
+﻿@using WeddingVeneus1.Areas.VenueDetails.Models;
+@using System.Data;
+@model VenueDetails_ViewModel;
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout1.cshtml";
+        ViewBag.ShowIcon = true;
+
+    }
 }
-<div class="pagetitle">
-    <h1>Venue</h1>
-    <nav>
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-            <li class="breadcrumb-item">Tables</li>
-            <li class="breadcrumb-item active">Data</li>
-        </ol>
-    </nav>
-</div><!-- End Page Title -->
-<section class="section">
-    <div class="row">
-        <div class="col-lg-12">
+@if(accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == "Admin")
 
-            <div class="card">
-                <div class="card-body">
-                    <h1 class="card-header text-primary"><strong>Venue List</strong></h1>
-                    <div class="row card-header">
-                        <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
-                        <div class="col-3 justify-content-end text-end">
-                            <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" class="btn shadow border btn-success col-9">
-                                <i class="bi bi-plus-circle"></i>   Add New Venue
-                            </a>
+{
+    <div class="pagetitle">
+        <h1>Venue</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item">Tables</li>
+                <li class="breadcrumb-item active">Data</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- End Page Title -->
+    <partial name="_SearchFormPartial" />
+
+    <section class="section">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-header text-primary"><strong>Venue List</strong></h1>
+                        <div class="row card-header">
+                            <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
+                            <div class="col-3 justify-content-end text-end">
+                                <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" class="btn shadow border btn-success col-9">
+                                    <i class="bi bi-plus-circle"></i>   Add New Venue
+                                </a>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Table with stripped rows -->
-                    <table class="table datatable">
-                        <thead>
-                            <tr>
-                                <th scope="col">VenueID</th>
-                                <th scope="col">VenueName</th>
-                                <th scope="col">StateName</th>
-                                <th scope="col">CityName</th>
-                                <th scope="col">GuestCapacity</th>
-                                
-                                
-                                
-                                <th scope="col">CategoryName</th>
-                                
-                                <th scope="col">Created</th>
-                                @*@<th scope="col">Modified</th>*@
-                                <th scope="col"></th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-
-
-                            @foreach (DataRow dr in Model.Rows)
-                            {
+                        <!-- Table with stripped rows -->
+                        <table class="table datatable">
+                            <thead>
                                 <tr>
-                                    <th scope="row">@dr["VenueID"]</th>
-                                    <td>@dr["VenueName"]</td>
-                                    <td>@dr["StateName"]</td>
-                                    <td>@dr["CityName"]</td>
-                                    <td>@dr["GuestCapacity"]</td>
-                                    
-                                    
-                                    
-                                    <td>@dr["CategoryName"]</td>
-                                    
-                                    <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yy")</td>
-                                    @*@<td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yy")</td>*@
+                                    <th scope="col">VenueID</th>
+                                    <th scope="col">VenueName</th>
+                                    <th scope="col">StateName</th>
+                                    <th scope="col">CityName</th>
+                                    <th scope="col">GuestCapacity</th>
 
-                                    <td>
-                                        <div>
-                                            
 
-                                            <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
 
-                                            
+                                    <th scope="col">CategoryName</th>
+
+                                    <th scope="col">Created</th>
+                                    @*@<th scope="col">Modified</th>*@
+                                    <th scope="col"></th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+
+                                @foreach (DataRow dr in Model.VenueDetails.Rows)
+                                {
+                                    <tr>
+                                        <th scope="row">@dr["VenueID"]</th>
+                                        <td>@dr["VenueName"]</td>
+                                        <td>@dr["StateName"]</td>
+                                        <td>@dr["CityName"]</td>
+                                        <td>@dr["GuestCapacity"]</td>
+
+
+
+                                        <td>@dr["CategoryName"]</td>
+
+                                        <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yy")</td>
+                                        @*@<td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yy")</td>*@
+
+                                        <td>
+                                            <div>
+
+
+                                                @if (ViewBag.ISConfirmed == false)
+                                                {
+                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="ApproveVenueStatus" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary mx-2">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                }
+                                                else
+                                                {
+
+                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                }
+
+
+
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <div style="margin-top:60px">
+        <partial name="_SearchFormPartial" />
+    </div>
+
+
+    <div class="container-fluid full-screen">
+        <div class="row">
+            <div class="pagetitle">
+                <h1>Venues</h1>
+                <nav>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueSearch">Home</a></li>
+
+                        <li class="breadcrumb-item active">Venues</li>
+                    </ol>
+                </nav>
+            </div><!-- End Page Title -->
+            <div class="col-12">
+                <div class="row">
+                    @foreach (DataRow dr in Model.VenueDetails.Rows)
+                    {
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+
+                            <!-- Card with an image on top -->
+                            <div class="card">
+                                <img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" class="card-img-top" alt="..." style="height:35vh;overflow:hidden">
+                                <div class="card-body pt-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-6">
+                                            <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                                Venue Name
+                                            </h5>
+                                            <h6>@dr["VenueName"]</h6>
 
 
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div class="col-lg-6 col-md-12 col-sm-6">
+                                            <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6;">
+                                                City
+                                            </h5>
+                                            <h6><i class="bi bi-geo-alt-fill"></i>@dr["CityName"]</h6>
 
-                            }
-                        </tbody>
-                        </table>
-                        </div>
-                        </div>
-                        </div>
-                        </div>
-                        </section>
 
-                        @section Scripts
-                            {
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-12 col-sm-6">
+                                            <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                                Category
+                                            </h5>
+                                            <h6><i class="bi bi-geo-alt-fill"></i>@dr["CategoryName"]</h6>
+
+
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-6">
+                                            <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                                Guest Capacity
+                                            </h5>
+                                            <h6><i class="bi bi-geo-alt-fill"></i>@dr["GuestCapacity"]</h6>
+
+
+                                        </div>
+                                        <div class="col-lg-6 col-md-12 col-sm-6">
+                                            <h5 style="font-weight: 600; color: rgba(1, 41, 112, 0.6);">
+                                                Rent Per Day
+                                            </h5>
+                                            <h6><i class="bi bi-geo-alt-fill"></i>@dr["RentPerDay"]</h6>
+
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div style="text-align:center">
+                                        <a asp-area="VenueDetails" class="btn btn-danger" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" asp-route-CityID="@dr["CityID"]">More Details</a>
+                                    </div>
+
+
+
+                                </div>
+                            </div><!-- End Card with an image on top -->
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+}
+
+
+@section Scripts
+ {
                             <script>
                                 $(document).ready(function () {
                                     $("#Sample_1").on("keyup", function () {
@@ -112,4 +238,31 @@
                                     }
                                 }
                             </script>
-                        }
+    <script>
+        function fnOnStateChange() {
+            var StateID = $(".StateID").val();
+            if (StateID !== "") {
+                $(".CityID").empty();
+                $(".CityID").append($("<option></option>").val("").html("Select City"));
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+                    data: {},
+                    dataType: "json",
+                    success: function (Result) {
+                        $.each(Result, function (key, value) {
+                            $(".CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                        });
+                    },
+                    error: function (r) {
+                        alert("Error while loading combobox");
+                    }
+                });
+            } else {
+                $(".CityID").empty();
+                $(".CityID").append($("<option></option>").val("").html("Select City"));
+            }
+        }
+    </script>
+}

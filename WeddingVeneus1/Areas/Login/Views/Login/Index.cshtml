@@ -1,0 +1,74 @@
+﻿@using System.Data;
+@model DataTable;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<section class="section">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-header text-primary"><strong>State List</strong></h1>
+                    <div class="row card-header">
+                        <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
+                        @* <div class="col-3 justify-content-end text-end">
+                            <a asp-area="State" asp-controller="State" asp-action="Create" class="btn shadow border btn-success col-9">
+                                <i class="bi bi-plus-circle"></i>   Add New State
+                            </a>
+                        </div> *@
+                    </div>
+
+
+
+
+
+
+                    <!-- Table with stripped rows -->
+                    <table class="table datatable">
+                        <thead>
+                            <tr>
+                                <th scope="col">UserID</th>
+                                <th scope="col">UserName</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Modified</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (DataRow dr in Model.Rows)
+                            {
+                                <tr>
+                                    <th scope="row">@dr["UserID"]</th>
+                                    <td>@dr["UserName"]</td>
+                                    <td>@dr["Email"]</td>
+                                    
+                                    <td>@Convert.ToDateTime(dr["Created"]).ToString("dd-MM-yy")</td>
+                                    <td>@Convert.ToDateTime(dr["Modified"]).ToString("dd-MM-yy")</td>
+                                    <td>
+
+                                        @* <a asp-area="State" asp-controller="State" asp-action="Delete" asp-route-StateID="@dr["StateID"]" class="btn btn-danger mx-2" onclick="fun1()">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </a> *@
+
+
+
+
+                                        <a asp-area="Login" asp-controller="Login" asp-action="ApproveAdminAccess" asp-route-UserID="@dr["UserID"]" class="btn btn-primary mx-2">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        
+
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

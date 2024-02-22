@@ -1,0 +1,130 @@
+﻿@using WeddingVeneus1.Areas.Login.Models;
+@model AdminDashboardViewModel
+@using System.Data;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div>
+    <div class="notification">
+        <a class="btn btn-primary" asp-area="State" asp-controller="State" asp-action="_Search" asp-route-ISConfirmed="False">
+            Add State Request
+        </a>
+        @foreach(DataRow dr in Model.UnconfirmedStateCount.Rows)
+        {
+            <span class="badge">@dr["UnconfirmedStateCount"]</span>
+        }
+    </div>
+ <div class="notification">
+<a class="btn btn-secondary" asp-area="City" asp-controller="City" asp-action="_Search" asp-route-ISConfirmed="False">
+    Add City Request
+</a>
+        @foreach (DataRow dr in Model.UnconfirmedCityCount.Rows)
+        {
+            <span class="badge">@dr["UnconfirmedCityCount"]</span>
+        }
+</div>
+ <div class="notification">
+<a class="btn btn-success" asp-area="Category" asp-controller="Category" asp-action="_Search" asp-route-ISConfirmed="False">
+    Add Category Request
+</a>
+        @foreach (DataRow dr in Model.UnconfirmedCategoryCount.Rows)
+        {
+            <span class="badge">@dr["UnconfirmedCategoryCount"]</span>
+        }
+</div>
+<div class="notification">
+<a class="btn btn-danger" asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" asp-route-ISConfirmed="False">
+    Add Venue Request
+</a>
+        @foreach (DataRow dr in Model.UnconfirmedVenueCount.Rows)
+        {
+            <span class="badge">@dr["UnconfirmedVenueCount"]</span>
+        }
+
+</div>
+    <div class="notification">
+        <a class="btn btn-primary" asp-area="Login" asp-controller="Login" asp-action="Index">
+            Approve Admin Access
+        </a>
+        @foreach (DataRow dr in Model.ApproveAdminAccessCount.Rows)
+        {
+            <span class="badge">@dr["UserCount"]</span>
+        }
+
+    </div>
+@foreach (DataRow dr in Model.StateCount.Rows)
+{
+    <a asp-area="State" asp-controller="State" asp-action="_Search" class="col-xxl-4 col-md-6 custom-card-anchor">
+        <div class="card info-card custom-card">
+            <div class="card-body">
+                <div class="card-inner">
+                    <h5 class="card-title">Registered State Count</h5>
+                    <div class="booking-count">
+                        <span class="count">@dr["StateCount"]</span>
+                        <span class="booking-label">Bookings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <!-- End Custom Card -->
+}
+@foreach (DataRow dr in Model.CityCount.Rows)
+{
+    <a asp-area="City" asp-controller="City" asp-action="_Search"  class="col-xxl-4 col-md-6 custom-card-anchor">
+        <div class="card info-card custom-card">
+            <div class="card-body">
+                <div class="card-inner">
+                    <h5 class="card-title">Registered City Count</h5>
+                    <div class="booking-count">
+                        <span class="count">@dr["CityCount"]</span>
+                        <span class="booking-label">Bookings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <!-- End Custom Card -->
+}
+@foreach (DataRow dr in Model.CategoryCount.Rows)
+{
+    <a asp-area="Category" asp-controller="Category" asp-action="_Search"  class="col-xxl-4 col-md-6 custom-card-anchor">
+        <div class="card info-card custom-card">
+            <div class="card-body">
+                <div class="card-inner">
+                    <h5 class="card-title">Registered Category Count</h5>
+                    <div class="booking-count">
+                        <span class="count">@dr["CategoryCount"]</span>
+                        <span class="booking-label">Bookings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <!-- End Custom Card -->
+}
+@foreach (DataRow dr in Model.VenueCount.Rows)
+{
+    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search"  class="col-xxl-4 col-md-6 custom-card-anchor">
+        <div class="card info-card custom-card">
+            <div class="card-body">
+                <div class="card-inner">
+                    <h5 class="card-title">Registered Venue Count</h5>
+                    <div class="booking-count">
+                        <span class="count">@dr["VenueCount"]</span>
+                        <span class="booking-label">Bookings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <!-- End Custom Card -->
+}

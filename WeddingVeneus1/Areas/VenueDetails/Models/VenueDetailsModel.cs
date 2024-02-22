@@ -32,6 +32,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public string AlcoholPolicy { get; set; }
         public string VenueDescription { get; set; }
         public string CancellationPolicy { get; set; }
+        public string? Email { get; set; }
     }
     public class VenueDetails_ViewModel
     {
@@ -57,12 +58,22 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public int? CategoryID { get; set; }
         public int? RentPerDay { get; set; }
         public int? GuestCapacity { get; set; }
+        public int? UserID   { get; set; }
+        public string? VenueName { get; set; }  
+        public string? SubmitType { get; set; }
     }
     public class Venue_Based_On_City
     {
         
         public int CityID { get; set; }
         public int VenueID { get; set; }
+
+    }
+    public class VenueDropdownModel
+    {
+
+        public int VenueID { get; set; }
+        public string VenueName { get; set; }
 
     }
 }

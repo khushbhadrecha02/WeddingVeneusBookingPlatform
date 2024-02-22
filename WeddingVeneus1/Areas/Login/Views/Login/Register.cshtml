@@ -28,6 +28,7 @@
                             </div>
 
                             <form class="row g-3 needs-validation" asp-controller="Login" asp-action="Register" method="post" enctype="multipart/form-data">
+                                <div asp-validation-summary="All"></div>
                                 <div class="col-12">
                                     <label asp-for="UserName" class="form-label"></label>
                                     <input type="text" asp-for="UserName" class="form-control">
@@ -45,7 +46,7 @@
                                     <div class="input-group has-validation">
                                         <span class="input-group-text" id="inputGroupPrepend">@@</span>
 
-                                        <select class="form-control border-0 shadow" asp-for="RoleID" asp-items="@(new SelectList(ViewBag.RoleList,"RoleID","RoleName"))">
+                                        <select class="form-control" asp-for="RoleID" asp-items="@(new SelectList(ViewBag.RoleList,"RoleID","RoleName"))">
                                             <option value="">Select Role</option>
                                         </select>
                                         @* <div class="invalid-feedback">Please choose a username.</div> *@
@@ -69,13 +70,7 @@
                                     <span asp-validation-for="ContactNO" class="text-danger"></span>
                                 </div>
 
-                                <div class="col-12">
-                                    <div class="form-check">
-                                        <input class="form-check-input" name="terms" type="checkbox" value="" id="acceptTerms" required>
-                                        <label class="form-check-label" for="acceptTerms">I agree and accept the <a href="#">terms and conditions</a></label>
-                                        <div class="invalid-feedback">You must agree before submitting.</div>
-                                    </div>
-                                </div>
+                                
                                 <div class="col-12">
                                     <button class="btn btn-primary w-100" type="submit">Create Account</button>
                                 </div>
@@ -104,6 +99,6 @@
 </div>
 @section Scripts{
     @{
-        <partial name="_ValidationScriptsPartial" />
+        // <partial name="_ValidationScriptsPartial" />
     }
 }

@@ -1,5 +1,6 @@
-﻿@using System.Data
-@model DataTable
+﻿@using WeddingVeneus1.Areas.State.Models;
+@using System.Data;
+@model MST_State_ViewModel;
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -15,6 +16,39 @@
         </ol> 
     </nav>
 </div><!-- End Page Title -->
+<section class="section">
+    <div class="row">
+        <div class="col-lg-6">
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Horizontal Form</h5>
+
+                    <!-- Horizontal Form -->
+                    <form asp-area="State" asp-controller="State" asp-action="_Search">
+                        <div class="row mb-3">
+                            
+                            <label asp-for="@Model.SearchModel.StateName" class="col-sm-2 col-form-label"></label>
+                            <div class="col-sm-10">
+                                <input type="text" asp-for="@Model.SearchModel.StateName" class="form-control" id="inputText">
+                            </div>
+                            <span asp-validation-for="@Model.SearchModel.StateName" class="text-danger"></span>
+                        </div>
+
+
+
+                        <div class="text-center">
+                            <button type="submit" value="search" name="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" value="list" name="submit" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </form><!-- End Horizontal Form -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="section">
     <div class="row">
         <div class="col-lg-12">
@@ -47,7 +81,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (DataRow dr in Model.Rows)
+                            @foreach (DataRow dr in Model.StateDataTable.Rows)
                             {
                                 <tr>
                                     <th scope="row">@dr["StateID"]</th>
@@ -59,9 +93,20 @@
                                             <a asp-area="State" asp-controller="State" asp-action="Delete" asp-route-StateID="@dr["StateID"]" class="btn btn-danger mx-2" onclick="fun1()">
                                                 <i class="bi bi-trash-fill"></i>
                                             </a>
+                                         @if(ViewBag.ISConfirmed == false)
+                                        {
+                                            <a asp-area="State" asp-controller="State" asp-action="ApproveStateStatus" asp-route-StateID="@dr["StateID"]" class="btn btn-primary mx-2">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            
                                             <a asp-area="State" asp-controller="State" asp-action="Create" asp-route-StateID="@dr["StateID"]" class="btn btn-primary mx-2">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
+                                        }
+                                        
                                         
                                     </td>
                                 </tr>

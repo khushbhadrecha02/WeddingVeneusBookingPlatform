@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System.Data;
 using WeddingVeneus1.Areas.State.Models;
 using WeddingVeneus1.DAL;
@@ -12,22 +14,54 @@ namespace WeddingVeneus1.Areas.Country.Controllers
         #region GloblaStateDalObject
         State_DALBase dal = new State_DALBase();
         #endregion
-        #region Index
-        public IActionResult Index()
-        {
+  //      #region Index
+  //      public IActionResult Index()
+  //      {
+  //          DataTable dt = dal.PR_State_SelectAll();
+  //          MST_State_ViewModel mST_State_ViewModel = new MST_State_ViewModel();
+  //          mST_State_ViewModel.StateDataTable = dt;
             
+  //          return View("Index", mST_State_ViewModel);
+  //      }
+		//#endregion
+		#region Search
+		public IActionResult _Search(MST_State_ViewModel mST_State_ViewModel,string? submit,bool? ISConfirmed)
+		{
+           if(ISConfirmed == null)
+            {
+                ISConfirmed = true;
+            }
+           ViewBag.ISConfirmed = ISConfirmed;
             
-            DataTable dt = dal.PR_State_SelectAll();
-            return View("Index", dt);
-        }
-        #endregion
-        #region Delete
-        public IActionResult Delete(int StateID)
+            if(submit != null)
+            {
+                mST_State_ViewModel.SearchModel.SubmitType = submit;
+            }
+			DataTable dt = dal.PR_MST_State_SelectByPage(mST_State_ViewModel.SearchModel,ISConfirmed);
+            mST_State_ViewModel.StateDataTable = dt;
+            return View("Index", mST_State_ViewModel);
+
+			
+			
+			
+		}
+		#endregion
+		#region Delete
+		public IActionResult Delete(int StateID)
         {
             
             dal.PR_State_DeleteByPK(StateID);
             TempData["Success"] = ("State Deleted Successfully");
             return RedirectToAction("Index");
+        }
+        #endregion
+        #region UpdateStateStatus
+        public IActionResult ApproveStateStatus(int StateID)
+        {
+
+            dal.PR_MST_State_ApproveStateStatus(StateID);
+            //TempData["Success"] = ("State Deleted Successfully");
+            return RedirectToAction("_Search");
         }
         #endregion
         #region Create
@@ -63,12 +97,25 @@ namespace WeddingVeneus1.Areas.Country.Controllers
         [HttpPost]
         public IActionResult Save(StateModel stateModel)
         {
-
+            Console.WriteLine(ModelState.IsValid);
             if (ModelState.IsValid)
             {
                 if (stateModel.StateID == null)
                 {
-                    dal.PR_State_Insert(stateModel);
+                    stateModel.UserID = HttpContext.Session.GetInt32("UserID").Value;
+                    if (HttpContext.Session.GetString("Role") == "VenueOwner")
+                    {
+                        dal.PR_State_Insert(stateModel);
+                        SendEmail(stateModel);
+                    }
+                    else
+                    {
+                        dal.PR_MST_State_InsertForAdmin(stateModel);
+                    }
+                        
+                    
+
+
 
                 }
                 else
@@ -91,7 +138,7 @@ namespace WeddingVeneus1.Areas.Country.Controllers
 
 
 
-                return RedirectToAction("Index");
+                return RedirectToAction("_Search");
             }
             else
             {
@@ -99,5 +146,40 @@ namespace WeddingVeneus1.Areas.Country.Controllers
             }
         }
         #endregion
+        public void SendEmail(StateModel stateModel)
+        {
+            Console.WriteLine(stateModel.Email);
+            try
+            {
+                var email = new MimeMessage();
+
+                email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
+                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+
+                email.Subject = "Request for adding new state";
+                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                {
+                    Text = "The venueowner registered with the following mailID " +  stateModel.Email  + " has requested to add the following state "  +  stateModel.StateName  + "."
+                };
+
+                using (var smtp = new SmtpClient())
+                {
+                    smtp.Connect("smtp.gmail.com", 587, false);
+
+                    // Note: only needed if the SMTP server requires authentication
+                    smtp.Authenticate("khushbhadrecha02@gmail.com", "evasrxlbzwmuogsr");
+
+                    smtp.Send(email);
+                    smtp.Disconnect(true);
+                }
+
+                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //return null;
+            }
+        }
     }
 }

@@ -1,8 +1,23 @@
-﻿@{
+﻿@using System.Data
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@foreach(DataRow dr in Model.Rows)
+{
+    <a asp-area="Booking" asp-controller="Booking" asp-action="Search" asp-route-VenueID="@dr["VenueID"]" class="col-xxl-4 col-md-6 custom-card-anchor">
+        <div class="card info-card custom-card">
+            <div class="card-body">
+                <div class="card-inner">
+                    <h5 class="card-title">@dr["VenueName"]</h5>
+                    <div class="booking-count">
+                        <span class="count">@dr["BookedCount"]</span>
+                        <span class="booking-label">Bookings</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+    <!-- End Custom Card -->
+}
