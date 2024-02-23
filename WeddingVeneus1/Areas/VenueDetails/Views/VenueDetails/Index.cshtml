@@ -239,11 +239,13 @@ else
                                 }
                             </script>
     <script>
-        function fnOnStateChange() {
-            var StateID = $(".StateID").val();
+        function fnOnStateChange(generalSelectorForState, generalSelectorForCity) {
+            var StateID = $(generalSelectorForState).val();
+            // var StateID = $(".StateID").val();
+            console.log("Stateid" + StateID);
             if (StateID !== "") {
-                $(".CityID").empty();
-                $(".CityID").append($("<option></option>").val("").html("Select City"));
+                $(generalSelectorForCity).empty();
+                $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
                 $.ajax({
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
@@ -252,7 +254,7 @@ else
                     dataType: "json",
                     success: function (Result) {
                         $.each(Result, function (key, value) {
-                            $(".CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                            $(generalSelectorForCity).append($("<option></option>").val(value.cityID).html(value.cityName));
                         });
                     },
                     error: function (r) {
@@ -260,8 +262,8 @@ else
                     }
                 });
             } else {
-                $(".CityID").empty();
-                $(".CityID").append($("<option></option>").val("").html("Select City"));
+                $(generalSelectorForCity).empty();
+                $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
             }
         }
     </script>

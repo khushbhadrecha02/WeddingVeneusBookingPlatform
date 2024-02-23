@@ -30,14 +30,14 @@
                                             <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
                                                 <div class="row align-items-center justify-content-center">
                                                     <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <select class="form-select StateID"  asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
-                                                            <option value="">Select State</option>
-                                                        </select>
+                                                    <select class="form-select" id="StateID" asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange('#StateID', '#CityID');">
+                                                        <option value="">Select State</option>
+                                                    </select>
                                                     </div>
                                                     <div class="col-lg-2 col-md-2 col-sm-12 ">
-                                                        <select class="form-select CityID"  asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
-                                                            <option value="">Select City</option>
-                                                        </select>
+                                                    <select class="form-select" id="CityID" asp-for="@Model.venue_Search_Model.CityID" asp-items="@(new SelectList(ViewBag.CityList,"CityID","CityName"))">
+                                                        <option value="">Select City</option>
+                                                    </select>
                                                     </div>
                                                     <div class="col-lg-2 col-md-2 col-sm-12">
                                                         <select class="form-select" asp-for="@Model.venue_Search_Model.CategoryID" asp-items="@(new SelectList(ViewBag.CategoryList,"CategoryID","CategoryName"))">
@@ -153,11 +153,13 @@
                  $('#scrollRight').css('right', -scrollLeft);
              });
          });
-         function fnOnStateChange() {
-             var StateID = $(".StateID").val();
+         function fnOnStateChange(generalSelectorForState, generalSelectorForCity) {
+             var StateID = $(generalSelectorForState).val();
+             // var StateID = $(".StateID").val();
+             console.log("Stateid" + StateID);
              if (StateID !== "") {
-                 $(".CityID").empty();
-                 $(".CityID").append($("<option></option>").val("").html("Select City"));
+                 $(generalSelectorForCity).empty();
+                 $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
                  $.ajax({
                      type: "POST",
                      contentType: "application/json; charset=utf-8",
@@ -166,7 +168,7 @@
                      dataType: "json",
                      success: function (Result) {
                          $.each(Result, function (key, value) {
-                             $(".CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+                             $(generalSelectorForCity).append($("<option></option>").val(value.cityID).html(value.cityName));
                          });
                      },
                      error: function (r) {
@@ -178,6 +180,59 @@
                  $(".CityID").append($("<option></option>").val("").html("Select City"));
              }
          }
+         // function fnOnStateChange2() {
+         //     var StateID = $("#StateID").val();
+         //     console.log("Stateid" + StateID);
+         //     if (StateID !== "") {
+         //         $("#CityID").empty();
+         //         $("#CityID").append($("<option></option>").val("").html("Select City"));
+         //         $.ajax({
+         //             type: "POST",
+         //             contentType: "application/json; charset=utf-8",
+         //             url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+         //             data: {},
+         //             dataType: "json",
+         //             success: function (Result) {
+         //                 $.each(Result, function (key, value) {
+         //                     $("#CityID").append($("<option></option>").val(value.cityID).html(value.cityName));
+         //                 });
+         //             },
+         //             error: function (r) {
+         //                 alert("Error while loading combobox");
+         //             }
+         //         });
+         //     } else {
+         //         $("#CityID").empty();
+         //         $("#CityID").append($("<option></option>").val("").html("Select City"));
+         //     }
+         // function fnOnStateChange(generalSelectorForState, generalSelectorForCity) {
+         //     var StateID = $(generalSelectorForState).val();
+         //     console.log("Stateid" + StateID);
+         //     if (StateID !== "") {
+         //         $(generalSelectorForCity).empty();
+         //         $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
+         //         $.ajax({
+         //             type: "POST",
+         //             contentType: "application/json; charset=utf-8",
+         //             url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
+         //             data: {},
+         //             dataType: "json",
+         //             success: function (Result) {
+         //                 $.each(Result, function (key, value) {
+         //                     $(generalSelectorForCity).append($("<option></option>").val(value.cityID).html(value.cityName));
+         //                 });
+         //             },
+         //             error: function (r) {
+         //                 alert("Error while loading combobox");
+         //             }
+         //         });
+         //     } else {
+         //         $(generalSelectorForCity).empty();
+         //         $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
+         //     }
+         // }
+
+         // }
          
 </script>
     

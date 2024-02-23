@@ -62,7 +62,7 @@ else
                         <form asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Search" method="post">
                             <div class="row align-items-center justify-content-center">
                                 <div class="col-lg-1 col-md-1 col-sm-12 mb-2 ">
-                                    <select class="form-select StateID" asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange();">
+                                    <select class="form-select StateID" asp-for="@Model.venue_Search_Model.StateID" asp-items="@(new SelectList(ViewBag.StateList,"StateID","StateName"))" onchange="fnOnStateChange('.StateID', '.CityID');">
                                         <option value="">Select State</option>
                                     </select>
                                 </div>
