@@ -31,6 +31,29 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
+        #region PR_MST_User_SelectByPK
+        public DataTable PR_MST_User_SelectByPK(int UserID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_SelectByPK");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int,UserID);
+                
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
         #region PR_Login_CheckUniqueConstraint
         public DataTable PR_Login_CheckUniqueConstraint(string Email)
         {
@@ -154,6 +177,27 @@ namespace WeddingVeneus1.DAL
                 DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_ApproveAdminAccess");
                 db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID);
                 db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        #endregion
+        #region PR_MSt_User_UpdateProfilePhoto
+        public void PR_MSt_User_UpdateProfilePhoto(UpdatePhoto updatePhoto)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MSt_User_UpdateProfilePhoto");
+                
+                db.AddInParameter(dbCMD, "Photopath", SqlDbType.VarChar, updatePhoto.PhotoPath);
+
+                db.ExecuteNonQuery(dbCMD);
+
+
 
             }
             catch (Exception ex)

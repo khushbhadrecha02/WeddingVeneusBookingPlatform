@@ -54,7 +54,10 @@ namespace WeddingVeneus1.Areas.Login.Controllers
                 {
                     HttpContext.Session.SetString("UserSession", Convert.ToString(dr["UserName"]));
                     HttpContext.Session.SetString("Role", Convert.ToString(dr["Role"]));
-                        HttpContext.Session.SetInt32("UserID",Convert.ToInt32(dr["UserID"]));
+                    HttpContext.Session.SetString("ContactNo", Convert.ToString(dr["ContactNo"]));
+                    HttpContext.Session.SetString("Email", Convert.ToString(dr["Email"]));
+
+                    HttpContext.Session.SetInt32("UserID",Convert.ToInt32(dr["UserID"]));
                     HttpContext.Session.SetInt32("ISApprovedAdmin", Convert.ToInt32(dr["ISAdminApproved"]));
                     HttpContext.Session.SetString("Photo", Convert.ToString(dr["Photopath"]));
 
@@ -195,10 +198,57 @@ namespace WeddingVeneus1.Areas.Login.Controllers
             DataTable dt = dal.PR_MST_User_SelectAdminRequestList();
             return View("Index", dt);
         }
+        public IActionResult Profile()
+        {
+
+            LoginViewModel loginViewModel = new LoginViewModel()
+            {
+                loginModelForDisplay = new LoginModelForDisplay(),
+                updatePassword = new UpdatePassword(),
+                updatePhoto = new UpdatePhoto()
+            };
+            int UserID = HttpContext.Session.GetInt32("UserID").Value;
+            DataTable dt = dal.PR_MST_User_SelectByPK(UserID);
+            foreach (DataRow dr  in dt.Rows) 
+            {
+                loginViewModel.loginModelForDisplay.UserName = Convert.ToString(dr["UserName"]);
+                loginViewModel.loginModelForDisplay.Email = Convert.ToString(dr["Email"]);
+                loginViewModel.loginModelForDisplay.ContactNO = Convert.ToString(dr["ContactNo"]);
+                loginViewModel.updatePhoto.PhotoPath = Convert.ToString(dr["PhotoPath"]);
+                loginViewModel.loginModelForDisplay.RoleName = Convert.ToString(dr["Role"]);
+                //loginViewModel.updatePassword.OldPassword = Convert.ToString(dr["Password"]);   
+            }
+                
+
+            return View("Profile",loginViewModel);
+        }
         public IActionResult ApproveAdminAccess(int UserID)
         {
             dal.PR_MST_User_ApproveAdminAccess(UserID);
             return View("Index");
+        }
+        public IActionResult UpdatePhoto(LoginViewModel loginViewModel) 
+        {
+            if (loginViewModel.updatePhoto.File != null)
+            {
+                String FilePath = "wwwroot\\Upload";
+                string path = Path.Combine(Directory.GetCurrentDirectory(), FilePath);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string fileNameWithPath = Path.Combine(path, loginViewModel.updatePhoto.File.FileName);
+                loginViewModel.updatePhoto.PhotoPath = "~" + FilePath.Replace("wwwroot\\", "/") + "/" + loginViewModel.updatePhoto.File.FileName;
+                using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+                {
+                    loginViewModel.updatePhoto.File.CopyTo(stream);
+                }
+                dal.PR_MSt_User_UpdateProfilePhoto(loginViewModel.updatePhoto);
+                 
+            }
+            string resolvedPath = Url.Content(loginViewModel.updatePhoto.PhotoPath);
+            HttpContext.Session.SetString("Photo", resolvedPath);
+            return Json(new { success = true, data = resolvedPath });
         }
 
     }
