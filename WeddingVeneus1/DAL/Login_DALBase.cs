@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data;
 using WeddingVeneus1.Areas.Login.Models;
 using WeddingVeneus1.Areas.Category.Models;
+using WeddingVeneus1.Areas.Booking.Models;
 
 namespace WeddingVeneus1.DAL
 {
@@ -194,6 +195,7 @@ namespace WeddingVeneus1.DAL
                 DbCommand dbCMD = db.GetStoredProcCommand("PR_MSt_User_UpdateProfilePhoto");
                 
                 db.AddInParameter(dbCMD, "Photopath", SqlDbType.VarChar, updatePhoto.PhotoPath);
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, updatePhoto.UserID);
 
                 db.ExecuteNonQuery(dbCMD);
 
@@ -203,6 +205,106 @@ namespace WeddingVeneus1.DAL
             catch (Exception ex)
             {
 
+            }
+        }
+        #endregion
+        #region PR_Mst_User_DeleteUserPhotoByUserID
+        public void PR_Mst_User_DeleteUserPhotoByUserID(int UserID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_Mst_User_DeleteUserPhotoByUserID");
+
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID);
+
+                db.ExecuteNonQuery(dbCMD);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);  
+            }
+        }
+        #endregion
+        #region PR_MST_User_UpdateUserDetails
+        public void PR_MST_User_UpdateUserDetails(LoginModelForDisplay loginModelForDisplay)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_UpdateUserDetails");
+
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, loginModelForDisplay.UserID);
+                db.AddInParameter(dbCMD, "UserName", SqlDbType.VarChar, loginModelForDisplay.UserName);
+                
+                db.AddInParameter(dbCMD, "ContactNO", SqlDbType.VarChar, loginModelForDisplay.ContactNO);
+
+                db.ExecuteNonQuery(dbCMD);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        #endregion
+        #region PR_MST_User_UpdateEmail
+        public void PR_MST_User_UpdateEmail(UpdateEmail updateEmail)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_UpdateEmail");
+
+                
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, updateEmail.UserID);
+
+                db.AddInParameter(dbCMD, "NewEmail", SqlDbType.VarChar, updateEmail.UpdatedEmail);
+
+                db.ExecuteNonQuery(dbCMD);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        #endregion
+        #region PR_MST_User_ChangePassword
+        public void PR_MST_User_ChangePassword(UpdatePassword updatePassword)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_User_ChangePassword");
+
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, updatePassword.UserID);
+                db.AddInParameter(dbCMD, "CurrentPassword", SqlDbType.VarChar, updatePassword.OldPassword);
+
+                db.AddInParameter(dbCMD, "NewPassword", SqlDbType.VarChar, updatePassword.ReEnterNewPassword);
+
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    if (dr.Read())
+                    {
+                        // Read the BookingID from the result set
+                        updatePassword.Status = Convert.ToString(dr["Status"]);
+                    }
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
         #endregion

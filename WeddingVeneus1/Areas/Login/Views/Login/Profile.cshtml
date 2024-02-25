@@ -29,13 +29,13 @@
 @*                         <img src="@Url.Content(accessor.HttpContext.Session.GetString("Photo") ?? "~/assets/img/Profile.jpg")" alt="Profile" class="rounded-circle" onerror="this.onerror=null;this.src='@Url.Content("~/assets/img/Profile.jpg")';">*@
                         @if (accessor.HttpContext.Session.GetString("Photo") != "")
                         {
-                            <img src="@Url.Content(Model.updatePhoto.PhotoPath)" alt="Profile" class="rounded-circle ProfilePhoto" >
+                            <img src="@Url.Content(Model.updatePhoto.PhotoPath)" id="ProfilePhoto" alt="Profile" class="rounded-circle ProfilePhoto" >
                         }
                         else
                         {
-                            <img src="@Url.Content("~/assets/img/Profile.jpg")" alt="Profile" class="rounded-circle">
+                        <img src="@Url.Content("~/assets/img/Profile.jpg")" alt="Profile" class="rounded-circle ProfilePhoto">
                         }
-                        <h2>@Model.loginModelForDisplay.UserName</h2>
+                    <h2 class="fullName">@Model.loginModelForDisplay.UserName</h2>
                         <h3>@Model.loginModelForDisplay.RoleName</h3>
               
             </div>
@@ -63,7 +63,9 @@
                 <li class="nav-item">
                   <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
                 </li>
-
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-email">Change Email</button>
+                        </li>
               </ul>
               <div class="tab-content pt-2">
 
@@ -74,7 +76,7 @@
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label ">Full Name</div>
-                    <div class="col-lg-9 col-md-8">@Model.loginModelForDisplay.UserName</div>
+                    <div class="col-lg-9 col-md-8 fullName">@Model.loginModelForDisplay.UserName</div>
                   </div>
 
                   
@@ -88,13 +90,13 @@
 
                   <div class="row">
                     <div class="col-lg-3 col-md-4 label">Phone</div>
-                                    <div class="col-lg-9 col-md-8">@Model.loginModelForDisplay.ContactNO</div>
+                                <div class="col-lg-9 col-md-8 ContactNO">@Model.loginModelForDisplay.ContactNO</div>
                                 
                   </div>
 
                   <div class="row">
-                    <div class="col-lg-3 col-md-4 label">Email</div>
-                                    <div class="col-lg-9 col-md-8">@Model.loginModelForDisplay.Email</div>
+                    <div  class="col-lg-3 col-md-4 label">Email</div>
+                    <div id="Email1" class="col-lg-9 col-md-8">@Model.loginModelForDisplay.Email</div>
                   </div>
 
                 </div>
@@ -102,33 +104,37 @@
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
                   <!-- Profile Edit Form -->
+                            <!-- HTML for the container -->
+                            <div id="validationErrorContainer" style="width: 100%;"></div>
+
                     
                     <div class="row mb-3">
                       <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                       <div class="col-md-8 col-lg-9">
                       @if (accessor.HttpContext.Session.GetString("Photo") != "")
                       {
-                                        <img  src="@Url.Content(Model.updatePhoto.PhotoPath)" alt="Profile" class="rounded-circle ProfilePhoto ">
+                                        <img src="@Url.Content(Model.updatePhoto.PhotoPath)" id="ProfilePhoto" alt="Profile" class="rounded-circle ProfilePhoto">
                       }
                       else
                       {
-                        <img src="@Url.Content("~/assets/img/Profile.jpg")" alt="Profile" class="rounded-circle">
+                                        <img src="@Url.Content("~/assets/img/Profile.jpg")" alt="Profile" class="rounded-circle ProfilePhoto">
                       }
                         <div class="pt-2">
                           <button id="openFileBtn" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></button>
+                          <button id="deleteUserPhotoBtn" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></button>
+
                            <form id="updatephotoform" enctype="multipart/form-data">
                           <input type="file" id="hiddenFileInput" asp-for="@Model.updatePhoto.File" hidden />
                            </form>
-                          <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
                         </div>
                       </div>
                     </div>
-                    
-                    <form>
+
+                     <form id="updateUserform">
                     <div class="row mb-3">
                       <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Full Name</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="fullName" type="text" class="form-control" id="fullName" asp-for="@Model.loginModelForDisplay.UserName">
+                        <input  type="text" class="form-control fullName"  asp-for="@Model.loginModelForDisplay.UserName">
                       </div>
                     </div>
 
@@ -145,17 +151,12 @@
                     <div class="row mb-3">
                       <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="phone" type="text" class="form-control" id="Phone" asp-for="@Model.loginModelForDisplay.ContactNO">
+                                        <input type="text" class="form-control ContactNO" asp-for="@Model.loginModelForDisplay.ContactNO">
                       </div>
                     </div>
 
-                    <div class="row mb-3">
-                      <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
-                      <div class="col-md-8 col-lg-9">
-                        <input name="email" type="email" class="form-control" id="Email" asp-for="@Model.loginModelForDisplay.Email">
-                      </div>
-                    </div>
-
+                    
+                    </form><!-- End Profile Edit Form -->
                     
 
                     
@@ -165,9 +166,9 @@
                     
 
                     <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                      <button id="UpdateUserDetail"  class="btn btn-primary">Save Changes</button>
                     </div>
-                  </form><!-- End Profile Edit Form -->
+                  
 
                 </div>
 
@@ -175,7 +176,9 @@
 
                 <div class="tab-pane fade pt-3" id="profile-change-password">
                   <!-- Change Password Form -->
-                  <form>
+                            <div id="validationError" style="width: 100%;"></div>
+
+                  <form id="ChangePasswordForm">
 
                     <div class="row mb-3">
                       <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
@@ -187,23 +190,53 @@
                     <div class="row mb-3">
                       <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="newpassword" type="password" class="form-control" id="newPassword" asp-for="@Model.updatePassword.NewPassword">
+                        <input  type="password" class="form-control"  asp-for="@Model.updatePassword.NewPassword">
                       </div>
                     </div>
 
                     <div class="row mb-3">
                       <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
                       <div class="col-md-8 col-lg-9">
-                        <input name="renewpassword" type="password" class="form-control" id="renewPassword" asp-for="@Model.updatePassword.ReEnterNewPassword">
+                        <input  type="password" class="form-control"  asp-for="@Model.updatePassword.ReEnterNewPassword">
                       </div>
                     </div>
 
-                    <div class="text-center">
-                      <button type="submit" class="btn btn-primary">Change Password</button>
-                    </div>
+                    
                   </form><!-- End Change Password Form -->
+                            <div class="text-center">
+                                <button id="ChangePassword" class="btn btn-primary">Change Password</button>
+                            </div>
 
                 </div>
+                        <div class="tab-pane fade pt-3" id="profile-change-email">
+                            <!-- Change Email Form -->
+                            <div id="validation" style="width: 100%;"></div>
+
+                            <form id="ChangeEmailForm">
+
+                                <div class="row mb-3">
+                                    <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Email</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input type="text" id="oldEmail" class="form-control" asp-for="@Model.updateEmail.Email" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Email</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <input type="text" id="newEmail" class="form-control" asp-for="@Model.updateEmail.UpdatedEmail">
+                                    </div>
+                                </div>
+
+                                
+
+
+                            </form><!-- End Change Password Form -->
+                            <div class="text-center">
+                                <button id="ChangeEmail" class="btn btn-primary">Update Email</button>
+                            </div>
+
+                        </div>
 
               </div><!-- End Bordered Tabs -->
 
@@ -251,6 +284,183 @@
                     }
                 });
             });
+            $('#deleteUserPhotoBtn').click(function () {
+                // Show confirmation dialog
+                if (confirm('Are you sure you want to delete your photo?')) {
+                    
+
+                    // User clicked 'Yes', make AJAX call to your action method
+                    $.ajax({
+                        url: '@Url.Action("DeletePhoto", "Login")', // Update YourControllerName accordingly
+                        type: 'POST',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.success) {
+                                // Handle success, maybe update UI to reflect the photo is deleted
+
+                                alert('Photo deleted successfully.');
+                                $('.ProfilePhoto').attr('src', response.data);
+                            } else {
+                                // Handle failure
+                                alert('Failed to delete photo.');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle AJAX error
+                            alert('An error occurred.');
+                        }
+                    });
+                } else {
+                    // User clicked 'No', do nothing
+                }
+            });
+            $('#UpdateUserDetail').click(function () {
+                // Show confirmation dialog
+                if (confirm('Are you sure you want to update your details?')) {
+                    var formData = new FormData($('#updateUserform')[0]);
+                    for (var pair of formData.entries()) {
+                        console.log(pair[0] + ', ' + pair[1]);
+                    }
+
+                    // User clicked 'Yes', make AJAX call to your action method
+                    $.ajax({
+                        url: '@Url.Action("UpdateUserDetails", "Login")', // Update YourControllerName accordingly
+                        type: 'POST',
+                        data: formData,
+                        processData: false, // Tell jQuery not to process the data
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+                                // Handle success, maybe update UI to reflect the photo is deleted
+                                console.log(response.data.userName)
+                                console.log(response.data.contactNO)
+                                console.log($('.fullName')); // Check if it selects the expected input
+                                console.log($('.ContactNO')); // Check if it selects the expected input
+                               
+                                alert('Details updated successfully.');
+                                // $('#fullName').val(response.data.userName);
+                                $('.fullName').text(response.data.userName);
+
+
+                                $('.ContactNO').text(response.data.contactNO);
+                                
+                                
+                            } else {
+                                // Handle failure
+                                var errorMessages = response.error.join('\n');
+                                alert('Failed to update details:\n' + errorMessages);
+                                // Optionally, display the errors in a specific part of your page
+                                // Clear previous errors
+                                $('#validationErrorContainer').html('');
+
+                                // Create an unordered list to hold the errors
+                                var $errorList = $('<ul>').css('color', 'red');
+
+                                // Iterate over the errors and add each to the list
+                                response.error.forEach(function (error) {
+                                    var $li = $('<li>').text(error);
+                                    $errorList.append($li);
+                                });
+
+                                // Append the list to the validation error container
+                                $('#validationErrorContainer').append($errorList);
+
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle AJAX error
+                            alert('An error occurred.');
+                        }
+                    });
+                } else {
+                    // User clicked 'No', do nothing
+                }
+            });
+            $('#ChangePassword').click(function () {
+                console.log("click event happened");
+                var formData = new FormData($('#ChangePasswordForm')[0]); // Ensure the form's ID is correct
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ', ' + pair[1]);
+                }
+
+                // Make AJAX call to your action method
+                $.ajax({
+                    url: '@Url.Action("ChangePassword", "Login")', // Make sure this is dynamically replaced with the correct URL if using Razor syntax or set the correct static URL
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // Tell jQuery not to process the data
+                    contentType: false, // Tell jQuery not to set contentType
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Password changed successfully.');
+                        } else {
+                            $('#validationError').html(''); // Clear previous errors
+                            var $errorList = $('<ul>').css('color', 'red'); // Create an unordered list to hold the errors
+
+                            if (Array.isArray(response.error)) {
+                                response.error.forEach(function (error) {
+                                    var $li = $('<li>').text(error);
+                                    $errorList.append($li);
+                                });
+                            } else {
+                                var $li = $('<li>').text(response.error);
+                                $errorList.append($li);
+                            }
+
+                            $('#validationError').append($errorList);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert('An error occurred.');
+                    }
+                });
+            });
+            $('#ChangeEmail').click(function () {
+                console.log("click event happened");
+                var formData = new FormData($('#ChangeEmailForm')[0]); // Ensure the form's ID is correct
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ', ' + pair[1]);
+                }
+
+                // Make AJAX call to your action method
+                $.ajax({
+                    url: '@Url.Action("ChangeEmail", "Login")', // Make sure this is dynamically replaced with the correct URL if using Razor syntax or set the correct static URL
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // Tell jQuery not to process the data
+                    contentType: false, // Tell jQuery not to set contentType
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Email updated successfully.');
+                            $('#oldEmail').val(response.data.email);
+                            $('#Email1').text(response.data.email);
+                            $('#newEmail').val('');
+
+
+                        } else {
+                            $('#validation').html(''); // Clear previous errors
+                            var $errorList = $('<ul>').css('color', 'red'); // Create an unordered list to hold the errors
+
+                            if (Array.isArray(response.error)) {
+                                response.error.forEach(function (error) {
+                                    var $li = $('<li>').text(error);
+                                    $errorList.append($li);
+                                });
+                            } else {
+                                var $li = $('<li>').text(response.error);
+                                $errorList.append($li);
+                            }
+
+                            $('#validation').append($errorList);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert('An error occurred.');
+                    }
+                });
+            });
+
+
 
 
         });

@@ -1,8 +1,10 @@
 ﻿using Humanizer.Localisation.TimeToClockNotation;
+using MailKit.Net.Imap;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using MimeKit;
+using NuGet.ProjectModel;
 using System.Data;
 using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.Login.Models;
@@ -205,7 +207,8 @@ namespace WeddingVeneus1.Areas.Login.Controllers
             {
                 loginModelForDisplay = new LoginModelForDisplay(),
                 updatePassword = new UpdatePassword(),
-                updatePhoto = new UpdatePhoto()
+                updatePhoto = new UpdatePhoto(),
+                updateEmail = new UpdateEmail(),   
             };
             int UserID = HttpContext.Session.GetInt32("UserID").Value;
             DataTable dt = dal.PR_MST_User_SelectByPK(UserID);
@@ -213,10 +216,11 @@ namespace WeddingVeneus1.Areas.Login.Controllers
             {
                 loginViewModel.loginModelForDisplay.UserName = Convert.ToString(dr["UserName"]);
                 loginViewModel.loginModelForDisplay.Email = Convert.ToString(dr["Email"]);
+                loginViewModel.updateEmail.Email = Convert.ToString(dr["Email"]);
                 loginViewModel.loginModelForDisplay.ContactNO = Convert.ToString(dr["ContactNo"]);
                 loginViewModel.updatePhoto.PhotoPath = Convert.ToString(dr["PhotoPath"]);
                 loginViewModel.loginModelForDisplay.RoleName = Convert.ToString(dr["Role"]);
-                //loginViewModel.updatePassword.OldPassword = Convert.ToString(dr["Password"]);   
+                   
             }
                 
 
@@ -227,6 +231,7 @@ namespace WeddingVeneus1.Areas.Login.Controllers
             dal.PR_MST_User_ApproveAdminAccess(UserID);
             return View("Index");
         }
+        #region UpdatePhoto
         public IActionResult UpdatePhoto(LoginViewModel loginViewModel) 
         {
             if (loginViewModel.updatePhoto.File != null)
@@ -243,6 +248,7 @@ namespace WeddingVeneus1.Areas.Login.Controllers
                 {
                     loginViewModel.updatePhoto.File.CopyTo(stream);
                 }
+                loginViewModel.updatePhoto.UserID = HttpContext.Session.GetInt32("UserID").Value;
                 dal.PR_MSt_User_UpdateProfilePhoto(loginViewModel.updatePhoto);
                  
             }
@@ -250,6 +256,132 @@ namespace WeddingVeneus1.Areas.Login.Controllers
             HttpContext.Session.SetString("Photo", resolvedPath);
             return Json(new { success = true, data = resolvedPath });
         }
+        #endregion
+
+        #region DeletePhoto
+        public IActionResult DeletePhoto()
+        {
+                int UserID = HttpContext.Session.GetInt32("UserID").Value;
+            dal.PR_Mst_User_DeleteUserPhotoByUserID(UserID);
+            string resolvedPath = Url.Content("~/assets/img/Profile.jpg");
+            HttpContext.Session.SetString("Photo", resolvedPath);
+            return Json(new { success = true, data = resolvedPath });
+        }
+        #endregion
+
+        #region UpdateUserDetails
+        public IActionResult UpdateUserDetails(LoginViewModel loginViewModel)
+        {
+            Console.WriteLine(loginViewModel.loginModelForDisplay.UserName);
+            var keysToIgnore = new List<string> { "updatePhoto", "updatePassword", "updateEmail" };
+
+            foreach (var keyToIgnore in keysToIgnore)
+            {
+                // Find and remove ModelState entries for the specified keys
+                foreach (var key in ModelState.Keys.Where(k => k.StartsWith(keyToIgnore)).ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            loginViewModel.loginModelForDisplay.UserID = HttpContext.Session.GetInt32("UserID").Value;
+            if (ModelState.IsValid)
+            {
+
+
+                dal.PR_MST_User_UpdateUserDetails(loginViewModel.loginModelForDisplay);
+                return Json(new { success = true, data = new { userName = loginViewModel.loginModelForDisplay.UserName, contactNO = loginViewModel.loginModelForDisplay.ContactNO } });
+                
+            }
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
+
+                return Json(new { success = false, error = errors });
+            }
+
+        }
+        #endregion
+        #region ChangePassword
+        public IActionResult ChangePassword(LoginViewModel loginViewModel)
+        {
+            
+            var keysToIgnore = new List<string> { "updatePhoto", "loginModelForDisplay","updateEmail" };
+
+            foreach (var keyToIgnore in keysToIgnore)
+            {
+                // Find and remove ModelState entries for the specified keys
+                foreach (var key in ModelState.Keys.Where(k => k.StartsWith(keyToIgnore)).ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            loginViewModel.updatePassword.UserID = HttpContext.Session.GetInt32("UserID").Value;
+            if (ModelState.IsValid)
+            {
+
+
+                dal.PR_MST_User_ChangePassword(loginViewModel.updatePassword);
+                if (loginViewModel.updatePassword.Status == "Updated")
+                {
+                    return Json(new { success = true, });
+                }
+                else
+                {
+                    return Json(new { success = false, error = "Current Password is wrong" });
+                }
+
+            }
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
+
+                return Json(new { success = false, error = errors });
+            }
+
+        }
+        #endregion
+        #region ChangeEmail
+        public IActionResult ChangeEmail(LoginViewModel loginViewModel)
+        {
+
+            var keysToIgnore = new List<string> { "updatePhoto", "loginModelForDisplay" , "updatePassword" };
+
+            foreach (var keyToIgnore in keysToIgnore)
+            {
+                // Find and remove ModelState entries for the specified keys
+                foreach (var key in ModelState.Keys.Where(k => k.StartsWith(keyToIgnore)).ToList())
+                {
+                    ModelState.Remove(key);
+                }
+            }
+            loginViewModel.updateEmail.UserID = HttpContext.Session.GetInt32("UserID").Value;
+
+            if (ModelState.IsValid)
+            {
+
+
+                dal.PR_MST_User_UpdateEmail(loginViewModel.updateEmail);
+                
+                    return Json(new { success = true, data = new { email = loginViewModel.updateEmail.UpdatedEmail, } });
+                
+                
+
+            }
+            else
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                       .Select(e => e.ErrorMessage)
+                                       .ToList();
+
+                return Json(new { success = false, error = errors });
+            }
+
+        }
+        #endregion
 
     }
 }
