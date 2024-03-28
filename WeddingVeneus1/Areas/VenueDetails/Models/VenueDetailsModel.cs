@@ -33,6 +33,8 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public string VenueDescription { get; set; }
         public string CancellationPolicy { get; set; }
         public string? Email { get; set; }
+        public string? UserName { get; set; }
+        public bool? flag { get; set; }
     }
     public class VenueDetails_ViewModel
     {
@@ -44,7 +46,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public DataTable City { get; set; }
         public DataTable Category { get; set; }
         public Venue_Search_Model venue_Search_Model { get; set; }
-         public Venue_Based_On_City venue_Based_On_City { get; set; }
+        public Venue_Based_On_City venue_Based_On_City { get; set; }
     }
     public class Venue_DropDown_Model
     {
@@ -58,13 +60,14 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public int? CategoryID { get; set; }
         public int? RentPerDay { get; set; }
         public int? GuestCapacity { get; set; }
-        public int? UserID   { get; set; }
-        public string? VenueName { get; set; }  
+        public int? UserID { get; set; }
+        public string? VenueName { get; set; }
         public string? SubmitType { get; set; }
+        public bool? flag { get; set; }
     }
     public class Venue_Based_On_City
     {
-        
+
         public int CityID { get; set; }
         public int VenueID { get; set; }
 
@@ -75,5 +78,10 @@ namespace WeddingVeneus1.Areas.VenueDetails.Models
         public int VenueID { get; set; }
         public string VenueName { get; set; }
 
+    }
+    public class AddFavourite
+    {
+        public int? UserID { get; set; }
+        public int? VenueID { get; set; }
     }
 }

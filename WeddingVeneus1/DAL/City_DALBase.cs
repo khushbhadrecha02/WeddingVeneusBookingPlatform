@@ -254,5 +254,70 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
+        #region PR_MST_City_SelectUserIDByCityID
+        public DataTable PR_MST_City_SelectUserIDByCityID(int CityID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_City_SelectUserIDByCityID");
+                db.AddInParameter(dbCMD, "CityID", SqlDbType.Int, CityID);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+        #endregion
+        #region PR_MST_STATE_RejectState
+        public override void RejectEntity(int CityID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_City_RejectState");
+                db.AddInParameter(dbCMD, "CityID", SqlDbType.Int, CityID);
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_State_SelectUserIDByStateID
+        public override DataTable SelectUserIDByEntityID(int CityID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_City_SelectUserIDByCityID");
+                db.AddInParameter(dbCMD, "CityID", SqlDbType.Int, CityID);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+        #endregion
     }
 }

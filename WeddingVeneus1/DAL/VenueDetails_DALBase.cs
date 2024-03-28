@@ -273,7 +273,7 @@ namespace WeddingVeneus1.DAL
         }
         #endregion
         #region PR_MST_VenueDetails_SelectByPage
-        public DataTable PR_MST_VenueDetails_SelectByPage(Venue_Search_Model venue_Search_Model,int? UserID,bool? ISConfirmed)
+        public DataTable PR_MST_VenueDetails_SelectByPage(Venue_Search_Model venue_Search_Model,int? UserID,bool? ISConfirmed,int? clientsideID,bool? ISFavourite)
         {
             try
             {
@@ -281,14 +281,17 @@ namespace WeddingVeneus1.DAL
                 DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_VenueDetails_SelectByPage");
                 if(venue_Search_Model == null)
                 {
-                    db.AddInParameter(dbCMD, "StateID", SqlDbType.Int, DBNull.Value);
+                        db.AddInParameter(dbCMD, "StateID", SqlDbType.Int, DBNull.Value);
                     db.AddInParameter(dbCMD, "CityID", SqlDbType.Int, DBNull.Value);
-                    db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, DBNull.Value);
+                    db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID.HasValue ? (object)UserID.Value : DBNull.Value);
                     db.AddInParameter(dbCMD, "VenueName", SqlDbType.VarChar, string.Empty);
                     db.AddInParameter(dbCMD, "CategoryID", SqlDbType.Int, DBNull.Value);
                     db.AddInParameter(dbCMD, "RentPerDay", SqlDbType.Int, DBNull.Value);
                     db.AddInParameter(dbCMD, "GuestCapacity", SqlDbType.Int, DBNull.Value);
                     db.AddInParameter(dbCMD, "ISConfirmed", SqlDbType.Bit, ISConfirmed);
+                    db.AddInParameter(dbCMD, "clientsideuserid", SqlDbType.Int, clientsideID.HasValue ? (object)clientsideID.Value : DBNull.Value);
+
+                    db.AddInParameter(dbCMD, "ISFavourite", SqlDbType.Int, ISFavourite.HasValue ? (object)ISFavourite.Value : DBNull.Value);
                 }
                 else
                 {
@@ -296,12 +299,15 @@ namespace WeddingVeneus1.DAL
                     {
                         db.AddInParameter(dbCMD, "StateID", SqlDbType.Int, DBNull.Value);
                         db.AddInParameter(dbCMD, "CityID", SqlDbType.Int, DBNull.Value);
-                        db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, DBNull.Value);
+                        db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID.HasValue ? (object)UserID.Value : DBNull.Value);
                         db.AddInParameter(dbCMD, "VenueName", SqlDbType.VarChar, string.Empty);
                         db.AddInParameter(dbCMD, "CategoryID", SqlDbType.Int, DBNull.Value);
                         db.AddInParameter(dbCMD, "RentPerDay", SqlDbType.Int, DBNull.Value);
                         db.AddInParameter(dbCMD, "GuestCapacity", SqlDbType.Int, DBNull.Value);
                         db.AddInParameter(dbCMD, "ISConfirmed", SqlDbType.Bit, ISConfirmed);
+                        db.AddInParameter(dbCMD, "clientsideuserid", SqlDbType.Int, clientsideID.HasValue ? (object)clientsideID.Value : DBNull.Value);
+                        db.AddInParameter(dbCMD, "ISFavourite", SqlDbType.Int, ISFavourite.HasValue ? (object)ISFavourite.Value : DBNull.Value);
+
                     }
                     else
                     {
@@ -313,8 +319,11 @@ namespace WeddingVeneus1.DAL
                         db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, UserID.HasValue ? (object)UserID.Value : DBNull.Value);
                         db.AddInParameter(dbCMD, "VenueName", SqlDbType.VarChar, venue_Search_Model.VenueName);
                         db.AddInParameter(dbCMD, "ISConfirmed", SqlDbType.Bit, ISConfirmed);
+                        db.AddInParameter(dbCMD, "clientsideuserid", SqlDbType.Int, clientsideID.HasValue ? (object)clientsideID.Value : DBNull.Value);
+                        db.AddInParameter(dbCMD, "ISFavourite", SqlDbType.Int, ISFavourite.HasValue ? (object)ISFavourite.Value : DBNull.Value);
+
                     }
-                    
+
                 }
                 
                 DataTable dt = new DataTable();
@@ -389,6 +398,108 @@ namespace WeddingVeneus1.DAL
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_VenueDetails_ADDFavourite
+        public void PR_MST_VenueDetails_ADDFavourite(AddFavourite addFavourite)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_VenueDetails_ADDFavourite");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, addFavourite.UserID);
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, addFavourite.VenueID);
+
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region MST_VenueDetails_RemoveFromFavourite
+        public void MST_VenueDetails_RemoveFromFavourite(AddFavourite addFavourite)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("MST_VenueDetails_RemoveFromFavourite");
+                db.AddInParameter(dbCMD, "UserID", SqlDbType.Int, addFavourite.UserID);
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, addFavourite.VenueID);
+
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_Venue_SelectUserIDByVenueID
+        public DataTable PR_MST_Venue_SelectUserIDByVenueID(int VenueID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_Venue_SelectUserIDByVenueID");
+                
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, VenueID);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+        #region PR_MST_STATE_RejectState
+        public override void RejectEntity(int VenueID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_VenueDetails_RejectVenue");
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, VenueID);
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_State_SelectUserIDByStateID
+        public override DataTable SelectUserIDByEntityID(int VenueID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_Venue_SelectUserIDByVenueID");
+                db.AddInParameter(dbCMD, "VenueID", SqlDbType.Int, VenueID);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
             }
         }
         #endregion

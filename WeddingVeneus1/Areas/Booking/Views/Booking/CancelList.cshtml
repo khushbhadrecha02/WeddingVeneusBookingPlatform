@@ -1,5 +1,7 @@
 ﻿@using System.Data;
 @model DataTable;
+@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
 @{
     Layout = "~/Views/Shared/_Layout1.cshtml";
 }
@@ -28,9 +30,10 @@
                                 <th scope="col">Number Of Days</th>
                                 <th scope="col">Reason</th>
                                 <th scope="col">Status</th>
-                                
-                                <th scope="col">Actions</th>
-
+                                 @if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == null)
+                                    {
+                                    <th scope="col">Actions</th>
+                                    }
 
 
 
@@ -52,26 +55,32 @@
                                     <td>@dr["NumberOfDays"]</td>
                                     <td>@dr["Reason"]</td>
                                     <td>@dr["Status"]</td>
-                                    
 
 
 
 
 
-                                    <td>
-                                        <div>
+                                    @if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == null)
+                                    {
+                                        <td>
+                                            <div>
+
+                                                <a asp-area="Booking" asp-controller="Booking" asp-action="PaymentPage" asp-route-bookingID="@dr["CancelID"]" class="btn btn-primary">
+                                                    <i class="bi bi-wallet"></i>
+                                                </a>
 
 
-                                            <a asp-area="Booking" asp-controller="Booking" asp-action="PaymentPage" asp-route-bookingID="@dr["CancelID"]" class="btn btn-primary">
-                                                <i class="bi bi-wallet"></i>
-                                            </a>
-                                            
 
 
 
 
-                                        </div>
-                                    </td>
+
+
+
+
+                                            </div>
+                                        </td>
+                                    }
                                 </tr>
 
                             }

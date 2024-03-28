@@ -55,11 +55,18 @@
                 <div class="card-body">
                     
                     <h1 class="card-header text-primary"><strong>Venue Categories List</strong></h1>
-                    <div class="row card-header">
-                        <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
-                        <div class="col-3 justify-content-end text-end">
-                            <a asp-area="Category" asp-controller="Category" asp-action="Create" class="btn shadow border btn-success col-9">
-                                <i class="bi bi-plus-circle"></i>   Add New Category
+                    <div class="d-flex align-items-center">
+                        @if (ViewBag.ISConfirmed == false)
+                        {
+                            <div class="d-flex">
+                                <button id="approveCategoryButton" class="btn btn-success">Approve</button>
+                                <button id="rejectCategoryBtn" class="btn btn-danger ms-2">Reject</button>
+                            </div>
+                        }
+
+                        <div class="ms-auto">
+                            <a href="@Url.Action("Create", "Category", new { area = "Category" })" class="btn shadow border btn-success">
+                                <i class="bi bi-plus-circle"></i> Add New Category
                             </a>
                         </div>
                     </div>
@@ -68,11 +75,19 @@
                     <table class="table datatable">
                         <thead>
                             <tr>
+                                @if (ViewBag.ISConfirmed == false)
+                                {
+
+                                    <th scope="col"><input type="checkbox" id="selectAllCheckboxes"></th>
+                                }
                                 <th scope="col">CategoryPhoto</th>
                                 <th scope="col">CategoryName</th>
                                  <th scope="col">Created</th>
                                 <th scope="col">Modified</th>
-                                <th scope="col"></th>
+                                @if (ViewBag.ISConfirmed == true)
+                                {
+                                    <th scope="col"></th>
+                                }
 
                             </tr>
                         </thead>
@@ -82,6 +97,10 @@
                             @foreach (DataRow dr in Model.CategoryDataTable.Rows)
                             {
                                 <tr>
+                                    @if (ViewBag.ISConfirmed == false)
+                                    {
+                                        <th> <input type="checkbox" class="form-check-input row-checkbox" name="categoryIds" value="@dr["CategoryID"]"></th>
+                                    }
                                     
                                     <td><img src="@Url.Content(Convert.ToString(dr["CategoryPhoto"]))" class="my-3" alt="Profile" height="50"  width="50"></td>
                                     <td>@dr["CategoryName"]</td>
@@ -93,23 +112,18 @@
                                     <td>
                                         <div>
 
-                                            <a asp-area="Category" asp-controller="Category" asp-action="Delete" asp-route-CategoryID="@dr["CategoryID"]" class="btn btn-danger mx-2" onclick="fun1()">
-                                                <i class="bi bi-trash-fill"></i>
-                                            </a>
+                                            
 
-                                            @if (ViewBag.ISConfirmed == false)
+                                            @if (ViewBag.ISConfirmed == true)
                                             {
-                                                <a asp-area="Category" asp-controller="Category" asp-action="ApproveCategoryStatus" asp-route-CategoryID="@dr["CategoryID"]" class="btn btn-primary mx-2">
-                                                    <i class="bi bi-pencil-square"></i>
+                                                <a asp-area="Category" asp-controller="Category" asp-action="Delete" asp-route-CategoryID="@dr["CategoryID"]" class="btn btn-danger mx-2" onclick="fun1()">
+                                                    <i class="bi bi-trash-fill"></i>
                                                 </a>
-                                            }
-                                            else
-                                            {
-
                                                 <a asp-area="Category" asp-controller="Category" asp-action="Create" asp-route-CategoryID="@dr["CategoryID"]" class="btn btn-primary mx-2">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             }
+                                            
 
 
                                         </div>
@@ -125,43 +139,13 @@
                         </div>
                         </div>
                         </section>
-@* <div class="row">
-    <div class="col-12">
-        <div class="row">
-        @foreach(DataRow dr in Model.Rows)
-        {
-        
-            <div class="col-3">
-        <div class="card">
-             <img src="@Url.Content(Convert.ToString(dr["CategoryPhoto"]))" class="card-img-top" alt="..."height="200vh">
-            <div class="card-body">
-                <h5 class="card-title text-center">@dr["CategoryName"]</h5>
-                <div class="text-center">
-                                <a asp-area="Category" asp-controller="Category" asp-action="CategoryDetail" class="btn btn-primary"><i class="bi bi-eye"></i></a>
-                </div>
-                
-            </div>
-        </div><!-- End Card with an image on top --> *@
-        </div>
-        
-        }
-        </div>
 
-    </div>
 
-</div>
 
                         @section Scripts
                             {
                             <script>
-                                $(document).ready(function () {
-                                    $("#Sample_1").on("keyup", function () {
-                                        var value = $(this).val().toLowerCase();
-                                        $("#Sample_2 tr").filter(function () {
-                                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                                        });
-                                    });
-                                });
+                                
                                 function fun1() {
                                     if (confirm("Are you sure you want to delete?")) {
                                         return true;
@@ -170,6 +154,17 @@
                                         return false;
                                     }
                                 }
+        var ApproveButton = "#approveCategoryButton";
+        var inputName = "categoryIds    ";
+        var ExpectedParameter = "categoryIDs";
+        var url = '@Url.Action("ApproveCategoryStatus", "Category")';
+        var selectAllCheckboxes = '#selectAllCheckboxes';
+        var ConfirmationMessage = "Are you sure you want to approve the selected categories?";
+        var url1 = '@Url.Action("RejectCategory", "Category")';
+        var DeleteButton = "#rejectCategoryBtn";
+
+
+        
                             </script>
                         }
 

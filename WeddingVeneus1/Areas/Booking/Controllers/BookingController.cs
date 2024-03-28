@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit;
 using MailKit.Net.Smtp;
+using WeddingVeneus1.CF;
 
 
 namespace WeddingVeneus1.Areas.Booking.Controllers
 {
     [Area("Booking")]
     [Route("Booking/{Controller}/{Action}")]
+    
     #region BookingController
     public class BookingController : Microsoft.AspNetCore.Mvc.Controller
     {
@@ -26,28 +28,32 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
         #endregion
 
         #region CheckBookingView
+        [CheckAccess]
         public IActionResult CheckBooking(int? venueID,string? venueName)
 
         {
 
 
-
-            Booking_ViewModel booking_ViewModel1 = new Booking_ViewModel
-            {
-
-                bookingModel = new CheckBooking()
+                Booking_ViewModel booking_ViewModel1 = new Booking_ViewModel
                 {
-                    VenueID = venueID,
-                    VenueName = venueName,
-                    UserID = HttpContext.Session.GetInt32("UserID").Value
 
-                }
-                
+                    bookingModel = new CheckBooking()
+                    {
+                        VenueID = venueID,
+                        VenueName = venueName,
+                        UserID = HttpContext.Session.GetInt32("UserID").Value
 
-    };
-            Console.WriteLine("Bookingdate" + booking_ViewModel1.bookingModel.BookingStartDate);
-            return View("CheckBooking",booking_ViewModel1);
-        }
+                    }
+
+
+                };
+                Console.WriteLine("Bookingdate" + booking_ViewModel1.bookingModel.BookingStartDate);
+                return View("CheckBooking", booking_ViewModel1);
+
+            }
+            
+
+        
         #endregion
 
         #region CheckBookingStatus
@@ -449,17 +455,7 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
         }
         #endregion
 
-        //public IActionResult Search()
-        //{
-        //    int UserID = HttpContext.Session.GetInt32("UserID").Value;
-
-        //    DataTable dt =dal.PR_Booking_SelectByUserID(UserID);
-
-
-        //    return View("BookingList",dt);
-
-
-        //}
+       
 
         #region ComboBox
         public void PopulateDropdownLists()
@@ -577,11 +573,22 @@ namespace WeddingVeneus1.Areas.Booking.Controllers
         #endregion
 
         #region CancelListByVenueID
-        public IActionResult CancelListByVenueID(int VenueID)
+        public IActionResult CancelListByVenueID(int venueID)
         {
             
-            DataTable dt = dal.PR_CancelBooking_SelectByVenueID(VenueID);
+            DataTable dt = dal.PR_CancelBooking_SelectByVenueID(venueID);
             return View("CancelListByVenueID", dt);
+
+        }
+        #endregion
+        #region RejectCancelRequest
+        public IActionResult RejectCancelRequest(int CancelID)
+        {
+                BookingModel bookingModel = new BookingModel();
+            bookingModel.CancelID = CancelID;
+              dal.PR_CancelBooking_RejectCancelBooking(bookingModel);
+            return RedirectToAction("CancelListByVenueID", new { venueID = bookingModel.VenueID });
+
 
         }
         #endregion

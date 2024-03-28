@@ -4,6 +4,7 @@ using MimeKit;
 using System.Data;
 using WeddingVeneus1.Areas.State.Models;
 using WeddingVeneus1.DAL;
+using WeddingVeneus1.Services;
 
 namespace WeddingVeneus1.Areas.Country.Controllers
 {
@@ -56,14 +57,57 @@ namespace WeddingVeneus1.Areas.Country.Controllers
         }
         #endregion
         #region UpdateStateStatus
-        public IActionResult ApproveStateStatus(int StateID)
+        [HttpPost]
+        public IActionResult ApproveStateStatus(int[] stateIds)
         {
+            foreach (var stateId in stateIds)
+            {
+                dal.PR_MST_State_ApproveStateStatus(stateId);
+                DataTable dt = dal.PR_MST_State_SelectUserIDByStateID(stateId);
+                foreach(DataRow dr in dt.Rows) 
+                {
+                    StateModel stateModel = new StateModel();
+                    stateModel.flag = true;
+                    stateModel.Email = Convert.ToString(dr["Email"]);
+                    stateModel.UserName = Convert.ToString(dr["UserName"]);
+                    stateModel.StateName = Convert.ToString(dr["StateName"]);
+                    SendEmail(stateModel);
+                }
 
-            dal.PR_MST_State_ApproveStateStatus(StateID);
-            //TempData["Success"] = ("State Deleted Successfully");
-            return RedirectToAction("_Search");
+            }
+            TempData["Success"] = "States Approved Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
         #endregion
+        //#region UpdateStateStatus
+        //[HttpPost]
+        //public IActionResult RejectState(int[] stateIds)
+        //{
+        //    foreach (var stateId in stateIds)
+        //    {
+        //        dal.PR_MST_STATE_RejectState(stateId);
+        //        DataTable dt = dal.PR_MST_State_SelectUserIDByStateID(stateId);
+        //        foreach (DataRow dr in dt.Rows)
+        //        {
+        //            StateModel stateModel = new StateModel();
+        //            stateModel.flag = true;
+        //            stateModel.Email = Convert.ToString(dr["Email"]);
+        //            stateModel.UserName = Convert.ToString(dr["UserName"]);
+        //            stateModel.StateName = Convert.ToString(dr["StateName"]);
+        //            SendEmail(stateModel);
+        //        }
+
+        //    }
+        //    TempData["Success"] = "States Approved Successfully";
+        //    var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+        //    // Return success message and URL in JSON
+        //    return Json(new { success = true, redirect = redirectUrl });
+        //}
+        //#endregion
         #region Create
         public IActionResult Create(int? stateid)
         {
@@ -148,19 +192,34 @@ namespace WeddingVeneus1.Areas.Country.Controllers
         #endregion
         public void SendEmail(StateModel stateModel)
         {
-            Console.WriteLine(stateModel.Email);
+            
             try
             {
                 var email = new MimeMessage();
 
                 email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
-                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
-
-                email.Subject = "Request for adding new state";
-                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                if(stateModel.flag == true) 
                 {
-                    Text = "The venueowner registered with the following mailID " +  stateModel.Email  + " has requested to add the following state "  +  stateModel.StateName  + "."
-                };
+                    email.To.Add(new MailboxAddress("Jimmy Pot", stateModel.Email));
+                    email.Subject = "Your request for adding new has been approved.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "Hey " + stateModel.UserName + "your request for adding state named " + stateModel.StateName + " had been approved by Mandap.com. " 
+                    };
+                }
+                else
+                {
+                    email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+                    email.Subject = "Request for adding new state.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "The venueowner registered with the following mailID " + stateModel.Email + " has requested to add the following state " + stateModel.StateName + "."
+                    };
+                }
+                
+
+                
+                
 
                 using (var smtp = new SmtpClient())
                 {
@@ -173,13 +232,23 @@ namespace WeddingVeneus1.Areas.Country.Controllers
                     smtp.Disconnect(true);
                 }
 
-                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 //return null;
             }
+        }
+        public IActionResult RejectState(int[] stateIds)
+        {
+            EntityService entityService = new EntityService();
+            entityService.RejectEntities<State_DALBase>(stateIds);
+            TempData["Success"] = "States Approved Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
     }
 }

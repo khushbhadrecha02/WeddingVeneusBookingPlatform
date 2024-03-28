@@ -101,10 +101,16 @@ namespace WeddingVeneus1.Areas.Login.Controllers
         {
             if (HttpContext.Session.GetString("UserSession") != null)
             {
-                HttpContext.Session.Remove("UserSession");
-                return RedirectToAction("Login");
+                HttpContext.Session.Remove("Role");
+                HttpContext.Session.Remove("ContactNo");
+                HttpContext.Session.Remove("Email");
+                HttpContext.Session.Remove("UserID");
+                HttpContext.Session.Remove("Photo");
+                HttpContext.Session.Remove("ISApprovedAdmin");
+                HttpContext.Session.Remove("");
+                return RedirectToAction("VenueSearch", "VenueDetails",new {  area = "VenueDetails" });
             }
-            return View();
+            return RedirectToAction("Login");
         }
         #region RegisterPost
         [HttpPost]

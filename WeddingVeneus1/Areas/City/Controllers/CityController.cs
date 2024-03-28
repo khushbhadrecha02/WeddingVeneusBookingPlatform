@@ -7,6 +7,7 @@ using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.Photos.Models;
 using WeddingVeneus1.Areas.State.Models;
 using WeddingVeneus1.DAL;
+using WeddingVeneus1.Services;
 
 namespace WeddingVeneus1.Areas.City.Controllers
 {
@@ -43,12 +44,29 @@ namespace WeddingVeneus1.Areas.City.Controllers
         }
         #endregion
         #region UpdateCityStatus
-        public IActionResult ApproveCityStatus(int CityID)
+        public IActionResult ApproveCityStatus(int[] cityIDs)
         {
 
-            dal.PR_MST_City_ApproveCityStatus(CityID);
-            //TempData["Success"] = ("State Deleted Successfully");
-            return RedirectToAction("_Search");
+            foreach (var cityId in cityIDs)
+            {
+                dal.PR_MST_City_ApproveCityStatus(cityId);
+                DataTable dt = dal.PR_MST_City_SelectUserIDByCityID(cityId);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    CityModel cityModel = new CityModel();
+                    cityModel.flag = true;
+                    cityModel.Email = Convert.ToString(dr["Email"]);
+                    cityModel.UserName = Convert.ToString(dr["UserName"]);
+                    cityModel.CityName = Convert.ToString(dr["CityName"]);
+                    SendEmail(cityModel);
+                }
+
+            }
+            TempData["Success"] = "States Approved Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
         #endregion
         #region Search
@@ -190,21 +208,37 @@ namespace WeddingVeneus1.Areas.City.Controllers
 
 
         #endregion
+        #region SendEmail
         public void SendEmail(CityModel cityModel)
         {
-            Console.WriteLine(cityModel.Email);
+
             try
             {
                 var email = new MimeMessage();
 
                 email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
-                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
-
-                email.Subject = "Request for adding new state";
-                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                if (cityModel.flag == true)
                 {
-                    Text = "The venueowner registered with the following mailID " + cityModel.Email + " has requested to add the following state " + cityModel.CityName + "."
-                };
+                    email.To.Add(new MailboxAddress("Jimmy Pot", cityModel.Email));
+                    email.Subject = "Your request for adding new city has been approved.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "Hey " + cityModel.UserName + "your request for adding city named " + cityModel.CityName + " had been approved by Mandap.com. "
+                    };
+                }
+                else
+                {
+                    email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+                    email.Subject = "Request for adding new city.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "The venueowner registered with the following mailID " + cityModel.Email + " has requested to add the following state " + cityModel.CityName + "."
+                    };
+                }
+
+
+
+
 
                 using (var smtp = new SmtpClient())
                 {
@@ -217,13 +251,24 @@ namespace WeddingVeneus1.Areas.City.Controllers
                     smtp.Disconnect(true);
                 }
 
-                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 //return null;
             }
+        }
+        #endregion
+        public IActionResult RejectCity(int[] cityIDs)
+        {
+            EntityService entityService = new EntityService();
+            entityService.RejectEntities<City_DALBase>(cityIDs);
+            TempData["Success"] = "Cities Rejected Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
     }
 }

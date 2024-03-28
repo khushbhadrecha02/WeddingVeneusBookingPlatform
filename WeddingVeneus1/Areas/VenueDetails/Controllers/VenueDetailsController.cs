@@ -1,12 +1,15 @@
-﻿using MailKit.Net.Smtp;
+﻿using Humanizer.Localisation.TimeToClockNotation;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using MimeKit;
 using System.Data;
 using WeddingVeneus1.Areas.Category.Models;
 using WeddingVeneus1.Areas.City.Models;
+using WeddingVeneus1.Areas.Login.Models;
 using WeddingVeneus1.Areas.State.Models;
 using WeddingVeneus1.Areas.VenueDetails.Models;
 using WeddingVeneus1.DAL;
+using WeddingVeneus1.Services;
 
 namespace WeddingVeneus1.Areas.VenueDetails.Controllers
 {
@@ -100,7 +103,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
                 list2.Add(vlst);
 
             }
-            ViewBag.CategoryList = list2;
+                ViewBag.CategoryList = list2;
         }
     #endregion
 
@@ -224,24 +227,55 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
         #endregion
 
         #region UpdateVenueStatus
-        public IActionResult ApproveVenueStatus(int VenueID)
+        public IActionResult ApproveVenueStatus(int[] venueIDs)
         {
 
-            dal.PR_MST_VenueDetails_ApproveVenueDetails(VenueID);
-            //TempData["Success"] = ("State Deleted Successfully");
-            return RedirectToAction("Search");
+            foreach (var venueId in venueIDs)
+            {
+                dal.PR_MST_VenueDetails_ApproveVenueDetails(venueId);
+                DataTable dt = dal.PR_MST_Venue_SelectUserIDByVenueID(venueId);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    VenueDetailsModel venueModel = new VenueDetailsModel();
+                    venueModel.flag = true;
+                    venueModel.Email = Convert.ToString(dr["Email"]);
+                    venueModel.UserName = Convert.ToString(dr["UserName"]);
+                    venueModel.VenueName = Convert.ToString(dr["VenueName"]);
+                    SendEmail(venueModel);
+                }
+
+            }
+            TempData["Success"] = "States Approved Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
         #endregion
 
         #region Search
-        public IActionResult Search(VenueDetails_ViewModel venueDetails_View,string? submit, bool? ISConfirmed)
+        public IActionResult Search(VenueDetails_ViewModel venueDetails_View,string? submit, bool? ISConfirmed,bool? ISFavourite)
         {
+            Console.WriteLine(ISFavourite);
             if (ISConfirmed == null)
             {
                 ISConfirmed = true;
             }
+            if (ISFavourite == true) 
+            {
+                if (HttpContext.Session.GetString("UserSession") != null)
+                {
+                    ViewBag.IsFavourite = true;
+                    Console.WriteLine("Continue");
+                }
+                else
+                {
+                    return RedirectToAction("Login", "Login", new { area = "Login" });
+                }
+            }
             ViewBag.ISConfirmed = ISConfirmed;
             int? UserID = null;
+            int? clientsideUserID = null;
 
             if (HttpContext.Session.GetString("Role") == "VenueOwner")
 
@@ -252,11 +286,20 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
 
                 Console.WriteLine(UserID);
             }
+            if (HttpContext.Session.GetString("Role") == "User")
+
+            {
+
+                int UserID1 = HttpContext.Session.GetInt32("UserID").Value;
+                clientsideUserID = UserID1;
+                Console.WriteLine(UserID);
+            }
             if (submit != null)
             {
                 venueDetails_View.venue_Search_Model.SubmitType = submit;
             }
-            DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venueDetails_View.venue_Search_Model,UserID,ISConfirmed);
+            DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venueDetails_View.venue_Search_Model,UserID,ISConfirmed,clientsideUserID,ISFavourite);
+
             var viewModel = new VenueDetails_ViewModel()
             {
 
@@ -272,19 +315,34 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
         #region SendEmail
         public void SendEmail(VenueDetailsModel venueDetailsModel)
         {
-            Console.WriteLine(venueDetailsModel.Email);
+
             try
             {
                 var email = new MimeMessage();
 
                 email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
-                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
-
-                email.Subject = "Request for adding new venue";
-                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                if (venueDetailsModel.flag == true)
                 {
-                    Text = "The venueowner registered with the following mailID " + venueDetailsModel.Email + " has requested to add the following venue " + venueDetailsModel.VenueName + "."
-                };
+                    email.To.Add(new MailboxAddress("Jimmy Pot", venueDetailsModel.Email));
+                    email.Subject = "Your request for adding new category has been approved.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "Hey " + venueDetailsModel.UserName + " your request for adding venue named " + venueDetailsModel.VenueName + " had been approved by Mandap.com. "
+                    };
+                }
+                else
+                {
+                    email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+                    email.Subject = "Request for adding new category.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "The venueowner registered with the following mailID " + venueDetailsModel.Email + " has requested to add the following state " + venueDetailsModel.VenueName + "."
+                    };
+                }
+
+
+
+
 
                 using (var smtp = new SmtpClient())
                 {
@@ -297,7 +355,7 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
                     smtp.Disconnect(true);
                 }
 
-                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+
             }
             catch (Exception ex)
             {
@@ -306,7 +364,56 @@ namespace WeddingVeneus1.Areas.VenueDetails.Controllers
             }
         }
         #endregion
+        #region
+        public IActionResult AddFavourite(int VenueID)
+        {
+            if(HttpContext.Session.GetString("UserSession") != null)
+            {
+                AddFavourite addFavourite = new AddFavourite();
+                addFavourite.UserID = HttpContext.Session.GetInt32("UserID");
+                addFavourite.VenueID = VenueID;
+                dal.PR_MST_VenueDetails_ADDFavourite(addFavourite);
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false }); 
+            }
 
+
+        }
+        #endregion
+        #region RemoveFavourite
+        public IActionResult RemoveFavourite(int VenueID)
+        {
+            if (HttpContext.Session.GetString("UserSession") != null)
+            {
+                AddFavourite addFavourite = new AddFavourite()
+                {
+                    UserID = HttpContext.Session.GetInt32("UserID"),
+                    VenueID = VenueID
+                };
+                dal.MST_VenueDetails_RemoveFromFavourite(addFavourite);
+                return Json(new { success = true });
+            }
+            else
+            {
+                return Json(new { success = false });
+            }
+
+
+        }
+        #endregion
+        public IActionResult RejectVenue(int[] venueIDs)
+        {
+            EntityService entityService = new EntityService();
+            entityService.RejectEntities<VenueDetails_DALBase>(venueIDs);
+            TempData["Success"] = "Venues Rejected Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
+        }
 
 
     }

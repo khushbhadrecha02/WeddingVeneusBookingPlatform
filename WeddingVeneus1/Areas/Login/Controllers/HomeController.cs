@@ -21,9 +21,11 @@ namespace WeddingVeneus1.Controllers
             {
                 VenueDetails_DALBase dal = new VenueDetails_DALBase();
                 bool? ISConfirmed = true;
+                bool? ISFavourite = null;
                 int UserID1 = HttpContext.Session.GetInt32("UserID").Value;
+                int? UserID2 = null;
                 Venue_Search_Model venue_Search_Model = new Venue_Search_Model();
-                DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venue_Search_Model, UserID1,ISConfirmed);
+                DataTable dt = dal.PR_MST_VenueDetails_SelectByPage(venue_Search_Model, UserID1,ISConfirmed,UserID2, ISFavourite);
                 return View("Index", dt);
 
 

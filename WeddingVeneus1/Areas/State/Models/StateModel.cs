@@ -12,6 +12,8 @@ namespace WeddingVeneus1.Areas.State.Models
         public string? StateName { get; set; }
         public int? UserID { get; set; }
         public string? Email { get; set; }
+        public bool?  flag { get; set; }
+        public string? UserName { get; set; }    
     }
     public class State_DropDown_Model
     {

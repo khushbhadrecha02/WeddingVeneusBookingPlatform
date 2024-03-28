@@ -230,6 +230,69 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
+        #region PR_MST_Category_SelectCategoryIDByCategoryID
+        public DataTable PR_MST_Category_SelectCategoryIDByCategoryID(int? Categoryid)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_Category_SelectCategoryIDByCategoryID");
+                db.AddInParameter(dbCMD, "CategoryID", SqlDbType.Int, Categoryid);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+        #region PR_MST_STATE_RejectState
+        public override void RejectEntity(int CategoryID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_VenueCategory_RejectState");
+                db.AddInParameter(dbCMD, "CategoryID", SqlDbType.Int, CategoryID);
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_State_SelectUserIDByStateID
+        public override DataTable SelectUserIDByEntityID(int Categoryid)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_Category_SelectCategoryIDByCategoryID");
+                db.AddInParameter(dbCMD, "CategoryID", SqlDbType.Int, Categoryid);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+        #endregion
 
     }
 }

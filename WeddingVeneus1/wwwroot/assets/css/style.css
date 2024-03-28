@@ -622,6 +622,37 @@ h6 {
 .header-nav .profile .dropdown-item:hover {
   background-color: #f6f9ff;
 }
+.product-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+
+.product-image img {
+    width: 50px; /* Adjust as needed */
+    height: auto;
+}
+
+.product-info {
+    flex-grow: 1;
+    padding-left: 15px;
+}
+
+.product-price {
+    font-weight: bold;
+}
+
+.delete-icon {
+    cursor: pointer;
+    color: #999;
+}
+
+    .delete-icon:hover {
+        color: #333;
+    }
 
 /*--------------------------------------------------------------
 # Sidebar
@@ -1176,6 +1207,11 @@ h6 {
 .contact .php-email-form textarea:focus {
   border-color: #4154f1;
 }
+.heart {
+    font-size: 25px;
+    color: red;
+}
+
 
 .contact .php-email-form input {
   padding: 10px 15px;

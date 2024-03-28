@@ -206,6 +206,47 @@ namespace WeddingVeneus1.DAL
             }
         }
         #endregion
+        #region PR_MST_STATE_RejectState
+        public override void RejectEntity(int StateID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_STATE_RejectState");
+                db.AddInParameter(dbCMD, "StateID", SqlDbType.Int, StateID);
+                db.ExecuteNonQuery(dbCMD);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        #endregion
+        #region PR_MST_State_SelectUserIDByStateID
+        public override DataTable SelectUserIDByEntityID(int StateID)
+        {
+            try
+            {
+                SqlDatabase db = new SqlDatabase(ConnString);
+                DbCommand dbCMD = db.GetStoredProcCommand("PR_MST_State_SelectUserIDByStateID");
+                db.AddInParameter(dbCMD, "StateID", SqlDbType.Int, StateID);
+                DataTable dt = new DataTable();
+                dt.Columns.Add();
+                using (IDataReader dr = db.ExecuteReader(dbCMD))
+                {
+                    dt.Load(dr);
+                }
+                return dt;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+        #endregion
 
     }
 }

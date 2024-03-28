@@ -4,7 +4,8 @@
 @using Microsoft.AspNetCore.Http
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor accessor
 @{
-    if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner")
+
+    if (accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == "Admin")
     {
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
@@ -15,7 +16,42 @@
 
     }
 }
-@if(accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == "Admin")
+@if(ViewBag.ISFavourite == true)
+{
+    <partial name="_SearchFormPartial" />
+    @foreach (DataRow dr in Model.VenueDetails.Rows)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="product-card d-flex justify-content-between">
+                        <div class="product-image">
+                            <img src="@Url.Content(Convert.ToString(dr["PhotoPath"]))" alt="Product Image">
+                        </div>
+                        <div class="product-info">
+                            <div>@dr["VenueName"]</div>
+                            <div>@dr["ContactNo"]</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center flex-grow-1">
+                            <div class="product-quantity">
+                                @dr["CityName"]
+                            </div>
+                            <div class="product-price">
+                                @dr["RentPerDay"]
+                            </div>
+                            <div data-venueid="@dr["VenueID"]" data-remove-url="@Url.Action("RemoveFavourite", "VenueDetails")">
+                                <i class="heart fa-solid fa-heart"></i> <!-- You will need FontAwesome for the trash icon -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    
+
+}
+else if(accessor.HttpContext.Session.GetString("Role") == "VenueOwner" || accessor.HttpContext.Session.GetString("Role") == "Admin")
 
 {
     <div class="pagetitle">
@@ -39,11 +75,18 @@
                 <div class="card">
                     <div class="card-body">
                         <h1 class="card-header text-primary"><strong>Venue List</strong></h1>
-                        <div class="row card-header">
-                            <div class="col-9"><p class="card-header col-6 fs-2 fs-sm-5"></p></div>
-                            <div class="col-3 justify-content-end text-end">
-                                <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" class="btn shadow border btn-success col-9">
-                                    <i class="bi bi-plus-circle"></i>   Add New Venue
+                        <div class="d-flex align-items-center">
+                            @if (ViewBag.ISConfirmed == false)
+                            {
+                                <div class="d-flex">
+                                    <button id="approveVenueButton" class="btn btn-success">Approve</button>
+                                    <button id="rejectVenueBtn" class="btn btn-danger ms-2">Reject</button>
+                                </div>
+                            }
+
+                            <div class="ms-auto">
+                                <a href="@Url.Action("Create", "VenueDetails", new { area = "VenueDetails" })" class="btn shadow border btn-success">
+                                    <i class="bi bi-plus-circle"></i> Add New Venue
                                 </a>
                             </div>
                         </div>
@@ -52,6 +95,11 @@
                         <table class="table datatable">
                             <thead>
                                 <tr>
+                                    @if (ViewBag.ISConfirmed == false)
+                                    {
+
+                                        <th scope="col"><input type="checkbox" id="selectAllCheckboxes"></th>
+                                    }
                                     <th scope="col">VenueID</th>
                                     <th scope="col">VenueName</th>
                                     <th scope="col">StateName</th>
@@ -64,7 +112,10 @@
 
                                     <th scope="col">Created</th>
                                     @*@<th scope="col">Modified</th>*@
-                                    <th scope="col"></th>
+                                    @if (ViewBag.ISConfirmed == true)
+                                    {
+                                        <th scope="col"></th>
+                                    }
 
                                 </tr>
                             </thead>
@@ -74,6 +125,10 @@
                                 @foreach (DataRow dr in Model.VenueDetails.Rows)
                                 {
                                     <tr>
+                                        @if (ViewBag.ISConfirmed == false)
+                                        {
+                                            <th> <input type="checkbox" class="form-check-input row-checkbox" name="venueIds" value="@dr["VenueID"]"></th>
+                                        }
                                         <th scope="row">@dr["VenueID"]</th>
                                         <td>@dr["VenueName"]</td>
                                         <td>@dr["StateName"]</td>
@@ -91,22 +146,16 @@
                                             <div>
 
 
-                                                @if (ViewBag.ISConfirmed == false)
+                                                @if (ViewBag.ISConfirmed == true)
                                                 {
-                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="ApproveVenueStatus" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary mx-2">
+                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Delete" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary mx-2">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
-                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
+                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="Create" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
                                                 }
-                                                else
-                                                {
-
-                                                    <a asp-area="VenueDetails" asp-controller="VenueDetails" asp-action="VenueDetail" asp-route-VenueID="@dr["VenueID"]" class="btn btn-primary">
-                                                        <i class="bi bi-eye"></i>
-                                                    </a>
-                                                }
+                                                
 
 
 
@@ -197,6 +246,24 @@ else
                                         </div>
 
                                     </div>
+                                    <!-- Example Heart Icon for a Venue -->
+                                    <div data-venueid="@dr["VenueID"]" data-add-url="@Url.Action("AddFavourite", "VenueDetails")" data-remove-url="@Url.Action("RemoveFavourite", "VenueDetails")">
+                                        @if (dr["ISFavourite"] == DBNull.Value)
+                                        {
+                                            <i class="heart fa-regular fa-heart"></i>
+
+                                        }
+                                        else if (Convert.ToBoolean(dr["ISFavourite"]) == true)
+                                        {
+                                            <i class="heart fa-solid fa-heart"></i>
+
+                                        }
+                                        else
+                                        {
+                                            <i class="heart fa-regular fa-heart"></i>
+                                        }
+                                        
+                                    </div>
 
 
                                     <div style="text-align:center">
@@ -221,14 +288,7 @@ else
 @section Scripts
  {
                             <script>
-                                $(document).ready(function () {
-                                    $("#Sample_1").on("keyup", function () {
-                                        var value = $(this).val().toLowerCase();
-                                        $("#Sample_2 tr").filter(function () {
-                                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                                        });
-                                    });
-                                });
+                                
                                 function fun1() {
                                     if (confirm("Are you sure you want to delete?")) {
                                         return true;
@@ -238,33 +298,16 @@ else
                                     }
                                 }
                             </script>
+    
     <script>
-        function fnOnStateChange(generalSelectorForState, generalSelectorForCity) {
-            var StateID = $(generalSelectorForState).val();
-            // var StateID = $(".StateID").val();
-            console.log("Stateid" + StateID);
-            if (StateID !== "") {
-                $(generalSelectorForCity).empty();
-                $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
-                $.ajax({
-                    type: "POST",
-                    contentType: "application/json; charset=utf-8",
-                    url: "@Url.Action("DropdownByState", "VenueDetails")" + "?StateID=" + StateID,
-                    data: {},
-                    dataType: "json",
-                    success: function (Result) {
-                        $.each(Result, function (key, value) {
-                            $(generalSelectorForCity).append($("<option></option>").val(value.cityID).html(value.cityName));
-                        });
-                    },
-                    error: function (r) {
-                        alert("Error while loading combobox");
-                    }
-                });
-            } else {
-                $(generalSelectorForCity).empty();
-                $(generalSelectorForCity).append($("<option></option>").val("").html("Select City"));
-            }
-        }
+        var dropdownByStateUrl = '@Url.Action("DropdownByState", "VenueDetails")';
+        var ApproveButton = "#approveVenueButton";
+        var inputName = "venueIds";
+        var ExpectedParameter = "venueIDs";
+        var url = '@Url.Action("ApproveVenueStatus", "VenueDetails")';
+        var selectAllCheckboxes = '#selectAllCheckboxes';
+        var ConfirmationMessage = "Are you sure you want to approve the selected venues?";
+        var url1 = '@Url.Action("RejectVenue", "VenueDetails")';
+        var DeleteButton = "#rejectVenueBtn";
     </script>
 }

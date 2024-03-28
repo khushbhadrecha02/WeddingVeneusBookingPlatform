@@ -6,6 +6,7 @@ using WeddingVeneus1.Areas.Category.Models;
 using WeddingVeneus1.Areas.City.Models;
 using WeddingVeneus1.Areas.State.Models;
 using WeddingVeneus1.DAL;
+using WeddingVeneus1.Services;
 
 namespace WeddingVeneus1.Areas.Category.Controllers
 {
@@ -85,13 +86,30 @@ namespace WeddingVeneus1.Areas.Category.Controllers
             return RedirectToAction("Index");
         }
         #endregion
-        #region UpdateStateStatus
-        public IActionResult ApproveCategoryStatus(int CategoryID)
+        #region UpdateCategoryStatus
+        public IActionResult ApproveCategoryStatus(int[] categoryIDs)
         {
 
-            dal.PR_MST_Category_ApproveCategoryStatus(CategoryID);
-            //TempData["Success"] = ("State Deleted Successfully");
-            return RedirectToAction("_Search");
+            foreach (var categoryId in categoryIDs)
+            {
+                dal.PR_MST_Category_ApproveCategoryStatus(categoryId);
+                DataTable dt = dal.PR_MST_Category_SelectCategoryIDByCategoryID(categoryId);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    CategoryModel categoryModel = new CategoryModel();
+                    categoryModel.flag = true;
+                    categoryModel.Email = Convert.ToString(dr["Email"]);
+                    categoryModel.UserName = Convert.ToString(dr["UserName"]);
+                    categoryModel.CategoryName = Convert.ToString(dr["CategoryName"]);
+                    SendEmail(categoryModel);
+                }
+
+            }
+            TempData["Success"] = "States Approved Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
         }
         #endregion
         #region Save
@@ -157,19 +175,34 @@ namespace WeddingVeneus1.Areas.Category.Controllers
         #region SendEmail
         public void SendEmail(CategoryModel categoryModel)
         {
-            Console.WriteLine(categoryModel.Email);
+
             try
             {
                 var email = new MimeMessage();
 
                 email.From.Add(new MailboxAddress("Khush Bhadrecha", "khushbhadrecha02@gmail.com"));
-                email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
-
-                email.Subject = "Request for adding new category";
-                email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                if (categoryModel.flag == true)
                 {
-                    Text = "The venueowner registered with the following mailID " + categoryModel.Email + " has requested to add the following category " + categoryModel.CategoryName + "."
-                };
+                    email.To.Add(new MailboxAddress("Jimmy Pot", categoryModel.Email));
+                    email.Subject = "Your request for adding new category has been approved.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "Hey " + categoryModel.UserName + " your request for adding category named " + categoryModel.CategoryName + " had been approved by Mandap.com. "
+                    };
+                }
+                else
+                {
+                    email.To.Add(new MailboxAddress("Jimmy Pot", "Potj961@gmail.com"));
+                    email.Subject = "Request for adding new category.";
+                    email.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
+                    {
+                        Text = "The venueowner registered with the following mailID " + categoryModel.Email + " has requested to add the following state " + categoryModel.CategoryName + "."
+                    };
+                }
+
+
+
+
 
                 using (var smtp = new SmtpClient())
                 {
@@ -182,7 +215,7 @@ namespace WeddingVeneus1.Areas.Category.Controllers
                     smtp.Disconnect(true);
                 }
 
-                //return RedirectToAction("Index", "Home"); // or any other action you prefer
+
             }
             catch (Exception ex)
             {
@@ -191,6 +224,16 @@ namespace WeddingVeneus1.Areas.Category.Controllers
             }
         }
         #endregion
+        public IActionResult RejectCategory(int[] categoryIDs)
+        {
+            EntityService entityService = new EntityService();
+            entityService.RejectEntities<Category_DALBase>(categoryIDs);
+            TempData["Success"] = "Cities Rejected Successfully";
+            var redirectUrl = Url.Action("Index", "Admin", new { area = "Login" });
+
+            // Return success message and URL in JSON
+            return Json(new { success = true, redirect = redirectUrl });
+        }
     }
 
 
