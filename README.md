@@ -15,7 +15,9 @@ Profile Management: Update user profile details including password, email, and p
 Favorite List: Add venue details to a favorite list.
 
 Technologies Used
-ASP.NET Framework
-ADO.NET (Database connectivity)
-DinkToPdf (PDF generation)
-MailKit (Email sending)
+ASP.NET Framework,
+ADO.NET (Database connectivity),
+DinkToPdf (PDF generation),
+MailKit (Email sending),
+Bootstrap,
+jQuery.
